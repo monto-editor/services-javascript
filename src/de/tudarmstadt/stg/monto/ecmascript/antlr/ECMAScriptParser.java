@@ -1,4 +1,4 @@
-package ECMAScript;// Generated from ECMAScript.g4 by ANTLR 4.5
+package de.tudarmstadt.stg.monto.ecmascript.antlr;// Generated from ECMAScript.g4 by ANTLR 4.5
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -133,7 +133,7 @@ public class ECMAScriptParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "ECMAScript/ECMAScript.g4"; }
+	public String getGrammarFileName() { return "antlr/ECMAScript.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

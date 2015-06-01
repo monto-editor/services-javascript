@@ -1,17 +1,9 @@
-import ECMAScript.ECMAScriptLexer;
-import ECMAScript.ECMAScriptParser;
-import Services.ECMAScriptService;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.SyntaxTree;
-import org.zeromq.ZContext;
+import de.tudarmstadt.stg.monto.ecmascript.service.*;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
-import org.antlr.v4.runtime.ANTLRFileStream;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Main {
 
@@ -24,44 +16,29 @@ public class Main {
     }
 
     public void run() {
-//        try {
-//            ANTLRFileStream fileIn = new ANTLRFileStream("/home/qam/test.js");
-//            ECMAScriptLexer lexer = new ECMAScriptLexer(fileIn);
-//            CommonTokenStream cts = new CommonTokenStream(lexer);
-//            ECMAScriptParser parser = new ECMAScriptParser(cts);
-//            SyntaxTree asd = parser.program();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        int[] ports = {5010, 5011};
+        String addr = "tcp://localhost:";
         List<ECMAScriptService> services = new ArrayList<>();
         Context context = ZMQ.context(1);
-        Scanner scanner = new Scanner(System.in);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                System.out.println("cleaning up before exiting..");
+                System.out.println("terminating...");
                 context.term();
                 for (ECMAScriptService service : services) {
                     service.stop();
                 }
+                System.out.println("terminated");
             }
         });
 
-        for (int port : ports) {
-            ECMAScriptService service = new ECMAScriptService("tcp://localhost:" + port, context);
-            service.start();
-            services.add(service);
-        }
+        services.add(new ECMAScriptTokenizer(addr + 5010, context));
+        services.add(new ECMAScriptParser(addr + 5011, context));
+//        services.add(new ECMAScriptOutliner(addr + 5012, context));
+//        services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
 
-        while (true) {
-            System.out.print(">");
-            String input = scanner.next();
-            if (input.equals("stop")) {
-                System.exit(1);
-            }
+        for (ECMAScriptService service : services) {
+            service.start();
         }
     }
 }
