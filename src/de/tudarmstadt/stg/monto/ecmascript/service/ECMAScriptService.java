@@ -11,6 +11,7 @@ import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,12 @@ public abstract class ECMAScriptService implements Runnable {
                 ProductMessage answer = processMessage(decodedMessages);
                 socket.send(ProductMessage.encode(answer).toJSONString());
             } catch (ZMQException e) {
-                System.out.println("service on " + address + " closing...");
                 break;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-
+        System.out.println("service on " + address + " closing...");
         socket.close();
     }
 
@@ -60,6 +62,6 @@ public abstract class ECMAScriptService implements Runnable {
         thread.interrupt();
     }
 
-    public abstract ProductMessage processMessage(List<Message> messages);
+    public abstract ProductMessage processMessage(List<Message> messages) throws IOException;
 
 }

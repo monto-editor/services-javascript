@@ -1,17 +1,25 @@
 package de.tudarmstadt.stg.monto.ecmascript.service;
 
 import de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptLexer;
+import de.tudarmstadt.stg.monto.ecmascript.ast.AST;
+import de.tudarmstadt.stg.monto.ecmascript.ast.NonTerminal;
+import de.tudarmstadt.stg.monto.ecmascript.ast.Terminal;
 import de.tudarmstadt.stg.monto.ecmascript.message.Message;
 import de.tudarmstadt.stg.monto.ecmascript.message.ProductMessage;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.zeromq.ZMQ;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
-public class ECMAScriptParser extends  ECMAScriptService {
+public class ECMAScriptParser extends ECMAScriptService {
 
 //    private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
 //    private CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -23,7 +31,87 @@ public class ECMAScriptParser extends  ECMAScriptService {
 
     @Override
     public ProductMessage processMessage(List<Message> messages) {
-        return new ProductMessage();
+        return null;
     }
 
+//    @Override
+//    public Either<Exception,ProductMessage> onMessage(List<Message> messages) {
+//        return Messages.getVersionMessage(messages).flatMap(version -> {
+//            try {
+//                Activator.getProfiler().start(JavaParser.class, "onVersionMessage", version);
+//
+//                lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
+//                CommonTokenStream tokens = new CommonTokenStream(lexer);
+//                parser.setTokenStream(tokens);
+//                ParserRuleContext root = parser.compilationUnit();
+//                ParseTreeWalker walker = new ParseTreeWalker();
+//
+//                Converter converter = new Converter();
+//                walker.walk(converter, root);
+//
+//                Contents content = ASTs.encode(converter.getRoot());
+//
+//                Activator.getProfiler().end(JavaParser.class, "onVersionMessage", version);
+//
+//                return Either.right(new ProductMessage(
+//                        version.getVersionId(),
+//                        new LongKey(1),
+//                        version.getSource(),
+//                        Products.ast,
+//                        Languages.json,
+//                        content));
+//
+//            } catch (Exception e) {
+//                return Either.left(e);
+//            }
+//        });
+//    }
+
+    private static class Converter implements ParseTreeListener {
+
+        private Deque<AST> nodes = new ArrayDeque<>();
+
+        @Override
+        public void enterEveryRule(ParserRuleContext context) {
+            if (context.getChildCount() > 0) {
+                String name = de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptParser.ruleNames[context.getRuleIndex()];
+                List<AST> childs = new ArrayList<>(context.getChildCount());
+                NonTerminal node = new NonTerminal(name, childs);
+                addChild(node);
+                nodes.push(node);
+            }
+        }
+
+        @Override
+        public void exitEveryRule(ParserRuleContext node) {
+            // Keep the last node to return
+            if (nodes.size() > 1)
+                nodes.pop();
+        }
+
+        @Override
+        public void visitErrorNode(ErrorNode err) {
+            org.antlr.v4.runtime.Token symbol = err.getSymbol();
+            addChild(new NonTerminal("error", new Terminal(symbol.getStartIndex(), symbol.getStopIndex() - symbol.getStartIndex() + 1)));
+        }
+
+        @Override
+        public void visitTerminal(TerminalNode terminal) {
+            org.antlr.v4.runtime.Token symbol = terminal.getSymbol();
+            Terminal token = new Terminal(symbol.getStartIndex(), symbol.getStopIndex() - symbol.getStartIndex() + 1);
+            if (nodes.size() == 0)
+                nodes.push(token);
+            else
+                addChild(token);
+        }
+
+        private void addChild(AST node) {
+            if (!nodes.isEmpty() && nodes.peek() instanceof NonTerminal)
+                ((NonTerminal) nodes.peek()).addChild(node);
+        }
+
+        public AST getRoot() {
+            return nodes.peek();
+        }
+    }
 }

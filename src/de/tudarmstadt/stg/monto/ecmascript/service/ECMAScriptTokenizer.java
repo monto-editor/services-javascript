@@ -4,12 +4,11 @@ import de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptLexer;
 import de.tudarmstadt.stg.monto.ecmascript.ast.Category;
 import de.tudarmstadt.stg.monto.ecmascript.ast.Token;
 import de.tudarmstadt.stg.monto.ecmascript.ast.Tokens;
-import de.tudarmstadt.stg.monto.ecmascript.message.Message;
-import de.tudarmstadt.stg.monto.ecmascript.message.ProductMessage;
-import de.tudarmstadt.stg.monto.ecmascript.message.VersionMessage;
+import de.tudarmstadt.stg.monto.ecmascript.message.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,21 +22,20 @@ public class ECMAScriptTokenizer extends ECMAScriptService {
     }
 
     @Override
-    public ProductMessage processMessage(List<Message> messages) {
+    public ProductMessage processMessage(List<Message> messages) throws IOException {
         VersionMessage version = (VersionMessage) messages.stream().filter(msg -> msg instanceof VersionMessage).findFirst().get();
-        lexer.setInputStream(new ANTLRInputStream(version.getContents()));
+        lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
+        Contents contents = new StringContent(Tokens.encode(tokens).toJSONString());
 
         return new ProductMessage(
-                version.getSource(),
                 version.getVersionId(),
-                "json",
-                "",
-                Tokens.encode(tokens).toJSONString(),
-                1,
-                "tokens",
-                ""
-        );
+                new LongKey(1),
+                version.getSource(),
+                Product.TOKENS,
+                Language.JSON,
+                contents
+                );
     }
 
     private Token convertToken(org.antlr.v4.runtime.Token token) {
