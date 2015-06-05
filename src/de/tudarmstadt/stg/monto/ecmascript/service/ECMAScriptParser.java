@@ -2,18 +2,20 @@ package de.tudarmstadt.stg.monto.ecmascript.service;
 
 import de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptLexer;
 import de.tudarmstadt.stg.monto.ecmascript.ast.AST;
+import de.tudarmstadt.stg.monto.ecmascript.ast.ASTs;
 import de.tudarmstadt.stg.monto.ecmascript.ast.NonTerminal;
 import de.tudarmstadt.stg.monto.ecmascript.ast.Terminal;
-import de.tudarmstadt.stg.monto.ecmascript.message.Message;
-import de.tudarmstadt.stg.monto.ecmascript.message.ProductMessage;
+import de.tudarmstadt.stg.monto.ecmascript.message.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -21,51 +23,39 @@ import java.util.List;
 
 public class ECMAScriptParser extends ECMAScriptService {
 
-//    private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
-//    private CommonTokenStream tokens = new CommonTokenStream(lexer);
-//    private de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptParser parser = new de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptParser(tokens);
+    private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
+    private CommonTokenStream tokens = new CommonTokenStream(lexer);
+    private de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptParser parser = new de.tudarmstadt.stg.monto.ecmascript.antlr.ECMAScriptParser(tokens);
 
     public ECMAScriptParser(String address, ZMQ.Context context) {
         super(address, context);
     }
 
     @Override
-    public ProductMessage processMessage(List<Message> messages) {
-        return null;
-    }
+    public ProductMessage processMessage(List<Message> messages) throws IOException {
+        VersionMessage version = (VersionMessage) messages.stream().filter(msg -> msg instanceof VersionMessage).findFirst().get();
 
-//    @Override
-//    public Either<Exception,ProductMessage> onMessage(List<Message> messages) {
-//        return Messages.getVersionMessage(messages).flatMap(version -> {
-//            try {
-//                Activator.getProfiler().start(JavaParser.class, "onVersionMessage", version);
-//
-//                lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
-//                CommonTokenStream tokens = new CommonTokenStream(lexer);
-//                parser.setTokenStream(tokens);
-//                ParserRuleContext root = parser.compilationUnit();
-//                ParseTreeWalker walker = new ParseTreeWalker();
-//
-//                Converter converter = new Converter();
-//                walker.walk(converter, root);
-//
-//                Contents content = ASTs.encode(converter.getRoot());
-//
-//                Activator.getProfiler().end(JavaParser.class, "onVersionMessage", version);
-//
-//                return Either.right(new ProductMessage(
-//                        version.getVersionId(),
-//                        new LongKey(1),
-//                        version.getSource(),
-//                        Products.ast,
-//                        Languages.json,
-//                        content));
-//
-//            } catch (Exception e) {
-//                return Either.left(e);
-//            }
-//        });
-//    }
+        lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        parser.setTokenStream(tokens);
+        ParserRuleContext root = parser.program();
+        ParseTreeWalker walker = new ParseTreeWalker();
+
+        Converter converter = new Converter();
+        walker.walk(converter, root);
+
+        Contents content = ASTs.encode(converter.getRoot());
+
+
+        return new ProductMessage(
+                version.getVersionId(),
+                new LongKey(1),
+                version.getSource(),
+                Product.AST,
+                Language.JSON,
+                content);
+    }
 
     private static class Converter implements ParseTreeListener {
 
