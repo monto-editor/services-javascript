@@ -114,4 +114,8 @@ public class VersionMessage implements Message {
 		return version;
 	}
 
+	public static VersionMessage getVersionMessage(List<Message> messages) {
+		return (VersionMessage) messages.stream().filter(msg -> msg instanceof VersionMessage).findFirst().get();
+	}
+
 }

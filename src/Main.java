@@ -34,8 +34,8 @@ public class Main {
 
         services.add(new ECMAScriptTokenizer(addr + 5010, context));
         services.add(new ECMAScriptParser(addr + 5011, context));
-//        services.add(new ECMAScriptOutliner(addr + 5012, context));
-//        services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
+        services.add(new ECMAScriptOutliner(addr + 5012, context));
+        services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
 
         for (ECMAScriptService service : services) {
             service.start();

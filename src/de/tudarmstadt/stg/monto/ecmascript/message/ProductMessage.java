@@ -104,4 +104,14 @@ public class ProductMessage implements Message {
 		return encoding;
 	}
 
+	public static ProductMessage getProductMessage(List<Message> messages, Product product, Language language) {
+		return (ProductMessage) messages.stream().filter(msg -> {
+			if (msg instanceof ProductMessage) {
+				ProductMessage msg1 = (ProductMessage) msg;
+				return msg1.getProduct().equals(product) && msg1.getLanguage().equals(language);
+			} else {
+				return false;
+			}
+		}).findAny().get();
+	}
 }

@@ -1,13 +1,13 @@
 package de.tudarmstadt.stg.monto.ecmascript.region;
 
 public interface IRegion {
-	public int getStartOffset();
+	int getStartOffset();
 	
-	public default int getLength() {
+	default int getLength() {
 		return getEndOffset() - getStartOffset();
 	}
 
-	public default int getEndOffset() {
+	default int getEndOffset() {
 		return getStartOffset() + getLength();
 	}
 	
@@ -15,7 +15,7 @@ public interface IRegion {
 	/**
 	 * a.inRange(b) tests if a is in range of b.
 	 */
-	public default boolean inRange(IRegion whole) {
+	default boolean inRange(IRegion whole) {
 		try {
 			return this.getStartOffset() >= whole.getStartOffset()
 			    && this.getEndOffset() <= whole.getEndOffset();
@@ -28,7 +28,7 @@ public interface IRegion {
 	/**
 	 * a.encloses(b) tests if b is in range of a.
 	 */
-	public default boolean encloses(IRegion part) {
+	default boolean encloses(IRegion part) {
 		return part.inRange(this);
 	}
 }

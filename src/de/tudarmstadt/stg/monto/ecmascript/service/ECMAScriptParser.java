@@ -33,8 +33,7 @@ public class ECMAScriptParser extends ECMAScriptService {
 
     @Override
     public ProductMessage processMessage(List<Message> messages) throws IOException {
-        VersionMessage version = (VersionMessage) messages.stream().filter(msg -> msg instanceof VersionMessage).findFirst().get();
-
+        VersionMessage version = VersionMessage.getVersionMessage(messages);
         lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
@@ -47,6 +46,7 @@ public class ECMAScriptParser extends ECMAScriptService {
 
         Contents content = ASTs.encode(converter.getRoot());
 
+        System.out.println(content);
 
         return new ProductMessage(
                 version.getVersionId(),

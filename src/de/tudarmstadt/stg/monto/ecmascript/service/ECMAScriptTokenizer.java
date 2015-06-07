@@ -23,7 +23,7 @@ public class ECMAScriptTokenizer extends ECMAScriptService {
 
     @Override
     public ProductMessage processMessage(List<Message> messages) throws IOException {
-        VersionMessage version = (VersionMessage) messages.stream().filter(msg -> msg instanceof VersionMessage).findFirst().get();
+        VersionMessage version = VersionMessage.getVersionMessage(messages);
         lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
         Contents contents = new StringContent(Tokens.encode(tokens).toJSONString());
