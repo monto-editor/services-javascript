@@ -51,8 +51,8 @@ public class ECMAScriptParser extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                Products.AST,
-                Languages.JSON,
+                ECMAScriptServices.AST,
+                ECMAScriptServices.JSON,
                 content);
     }
 

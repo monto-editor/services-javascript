@@ -22,7 +22,7 @@ public class ECMAScriptCodeCompletion extends MontoService {
     public ProductMessage onMessage(List<Message> messages) throws ParseException{
         //TODO modify for javascript
         VersionMessage version = Messages.getVersionMessage(messages);
-        ProductMessage ast = Messages.getProductMessage(messages, Products.AST, Languages.JSON);
+        ProductMessage ast = Messages.getProductMessage(messages, ECMAScriptServices.AST, ECMAScriptServices.JSON);
 
         System.out.println(version.getSelections().toString());
 
@@ -49,8 +49,8 @@ public class ECMAScriptCodeCompletion extends MontoService {
                         version.getVersionId(),
                         new LongKey(1),
                         version.getSource(),
-                        Products.COMPLETIONS,
-                        Languages.JSON,
+                        ECMAScriptServices.COMPLETIONS,
+                        ECMAScriptServices.JSON,
                         content,
                         new ProductDependency(ast));
             }

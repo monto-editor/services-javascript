@@ -21,7 +21,7 @@ public class ECMAScriptOutliner extends MontoService {
     @Override
     public ProductMessage onMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
-        ProductMessage ast = Messages.getProductMessage(messages, Products.AST, Languages.JSON);
+        ProductMessage ast = Messages.getProductMessage(messages, ECMAScriptServices.AST, ECMAScriptServices.JSON);
 
         NonTerminal root = (NonTerminal) ASTs.decode(ast);
 
@@ -33,8 +33,8 @@ public class ECMAScriptOutliner extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                Products.OUTLINE,
-                Languages.JSON,
+                ECMAScriptServices.OUTLINE,
+                ECMAScriptServices.JSON,
                 content,
                 new ProductDependency(ast));
     }

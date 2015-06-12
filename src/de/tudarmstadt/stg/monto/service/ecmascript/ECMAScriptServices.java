@@ -1,23 +1,23 @@
 package de.tudarmstadt.stg.monto.service.ecmascript;
 
 import de.tudarmstadt.stg.monto.service.MontoService;
+import de.tudarmstadt.stg.monto.service.message.Language;
+import de.tudarmstadt.stg.monto.service.message.Product;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class ECMAScriptServices {
 
-    public Main() {
-
-    }
+    public static final Language JSON = new Language("json");
+    public static final Product TOKENS = new Product("tokens");
+    public static final Product AST = new Product("ast");
+    public static final Product OUTLINE = new Product("outline");
+    public static final Product COMPLETIONS = new Product("completions");
 
     public static void main(String[] args) {
-        new Main().run();
-    }
-
-    public void run() {
         String addr = "tcp://localhost:";
         List<MontoService> services = new ArrayList<>();
         Context context = ZMQ.context(1);

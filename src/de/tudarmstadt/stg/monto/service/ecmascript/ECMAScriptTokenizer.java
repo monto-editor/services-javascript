@@ -32,8 +32,8 @@ public class ECMAScriptTokenizer extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                Products.TOKENS,
-                Languages.JSON,
+                ECMAScriptServices.TOKENS,
+                ECMAScriptServices.JSON,
                 contents
                 );
     }
