@@ -1,4 +1,8 @@
-import de.tudarmstadt.stg.monto.ecmascript.service.*;
+import de.tudarmstadt.stg.monto.service.MontoService;
+import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptCodeCompletion;
+import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptOutliner;
+import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptParser;
+import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptTokenizer;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 
@@ -17,7 +21,7 @@ public class Main {
 
     public void run() {
         String addr = "tcp://localhost:";
-        List<ECMAScriptService> services = new ArrayList<>();
+        List<MontoService> services = new ArrayList<>();
         Context context = ZMQ.context(1);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -25,7 +29,7 @@ public class Main {
             public void run() {
                 System.out.println("terminating...");
                 context.term();
-                for (ECMAScriptService service : services) {
+                for (MontoService service : services) {
                     service.stop();
                 }
                 System.out.println("terminated");
@@ -37,7 +41,7 @@ public class Main {
         services.add(new ECMAScriptOutliner(addr + 5012, context));
         services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
 
-        for (ECMAScriptService service : services) {
+        for (MontoService service : services) {
             service.start();
         }
     }
