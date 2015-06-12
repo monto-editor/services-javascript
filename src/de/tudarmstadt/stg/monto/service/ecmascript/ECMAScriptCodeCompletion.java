@@ -1,10 +1,11 @@
 package de.tudarmstadt.stg.monto.service.ecmascript;
 
+import de.tudarmstadt.stg.monto.service.MontoService;
 import de.tudarmstadt.stg.monto.service.ast.*;
 import de.tudarmstadt.stg.monto.service.completion.Completion;
+import de.tudarmstadt.stg.monto.service.completion.Completions;
 import de.tudarmstadt.stg.monto.service.message.*;
 import de.tudarmstadt.stg.monto.service.region.IRegion;
-import de.tudarmstadt.stg.monto.service.MontoService;
 import org.zeromq.ZMQ;
 
 import java.util.ArrayList;
@@ -18,10 +19,10 @@ public class ECMAScriptCodeCompletion extends MontoService {
     }
 
     @Override
-    public ProductMessage processMessage(List<Message> messages) {
+    public ProductMessage onMessage(List<Message> messages) throws ParseException{
         //TODO modify for javascript
-        VersionMessage version = VersionMessage.getVersionMessage(messages);
-        ProductMessage ast = ProductMessage.getProductMessage(messages, Product.AST, Language.JSON);
+        VersionMessage version = Messages.getVersionMessage(messages);
+        ProductMessage ast = Messages.getProductMessage(messages, Products.AST, Languages.JSON);
 
         System.out.println(version.getSelections().toString());
 
@@ -43,14 +44,13 @@ public class ECMAScriptCodeCompletion extends MontoService {
                                         version.getSelections().get(0).getStartOffset(),
                                         comp.getIcon()));
 
-                Contents content = new StringContent(Completion.encode(relevant).toJSONString());
-
+                Contents content = new StringContent(Completions.encode(relevant).toJSONString());
                 return new ProductMessage(
                         version.getVersionId(),
                         new LongKey(1),
                         version.getSource(),
-                        Product.COMPLETIONS,
-                        Language.JSON,
+                        Products.COMPLETIONS,
+                        Languages.JSON,
                         content,
                         new ProductDependency(ast));
             }
@@ -80,15 +80,15 @@ public class ECMAScriptCodeCompletion extends MontoService {
         public void visit(NonTerminal node) {
             switch (node.getName()) {
                 case "normalClassDeclaration":
-                    structureDeclaration(node, "class", IconType.EMPTY);
+                    structureDeclaration(node, "class", IconType.NO_IMG);
                     break;
 
                 case "enumDeclaration":
-                    structureDeclaration(node, "enum", IconType.EMPTY);
+                    structureDeclaration(node, "enum", IconType.NO_IMG);
                     break;
 
                 case "enumConstant":
-                    leaf(node, "constant", IconType.EMPTY);
+                    leaf(node, "constant", IconType.NO_IMG);
                     break;
 
                 case "fieldDeclaration":
@@ -98,11 +98,11 @@ public class ECMAScriptCodeCompletion extends MontoService {
 
                 case "variableDeclaratorId":
                     if (fieldDeclaration)
-                        leaf(node, "field", IconType.EMPTY);
+                        leaf(node, "field", IconType.NO_IMG);
                     break;
 
                 case "methodDeclarator":
-                    leaf(node, "method", IconType.EMPTY);
+                    leaf(node, "method", IconType.NO_IMG);
 
                 default:
                     node.getChildren().forEach(child -> child.accept(this));
@@ -181,6 +181,7 @@ public class ECMAScriptCodeCompletion extends MontoService {
                 return false;
             }
         }
+
     }
 
     private static <A> A last(List<A> list) {

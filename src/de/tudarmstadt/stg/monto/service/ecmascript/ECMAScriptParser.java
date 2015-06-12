@@ -33,8 +33,8 @@ public class ECMAScriptParser extends MontoService {
     }
 
     @Override
-    public ProductMessage processMessage(List<Message> messages) throws IOException {
-        VersionMessage version = VersionMessage.getVersionMessage(messages);
+    public ProductMessage onMessage(List<Message> messages) throws IOException {
+        VersionMessage version = Messages.getVersionMessage(messages);
         lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
@@ -51,8 +51,8 @@ public class ECMAScriptParser extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                Product.AST,
-                Language.JSON,
+                Products.AST,
+                Languages.JSON,
                 content);
     }
 

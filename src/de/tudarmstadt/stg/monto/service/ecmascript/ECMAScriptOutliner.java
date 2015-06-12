@@ -3,6 +3,7 @@ package de.tudarmstadt.stg.monto.service.ecmascript;
 import de.tudarmstadt.stg.monto.service.ast.*;
 import de.tudarmstadt.stg.monto.service.message.*;
 import de.tudarmstadt.stg.monto.service.outline.Outline;
+import de.tudarmstadt.stg.monto.service.outline.Outlines;
 import de.tudarmstadt.stg.monto.service.region.Region;
 import de.tudarmstadt.stg.monto.service.MontoService;
 import org.zeromq.ZMQ;
@@ -18,22 +19,22 @@ public class ECMAScriptOutliner extends MontoService {
     }
 
     @Override
-    public ProductMessage processMessage(List<Message> messages) {
-        VersionMessage version = VersionMessage.getVersionMessage(messages);
-        ProductMessage ast = ProductMessage.getProductMessage(messages, Product.AST, Language.JSON);
+    public ProductMessage onMessage(List<Message> messages) throws ParseException {
+        VersionMessage version = Messages.getVersionMessage(messages);
+        ProductMessage ast = Messages.getProductMessage(messages, Products.AST, Languages.JSON);
 
         NonTerminal root = (NonTerminal) ASTs.decode(ast);
 
         OutlineTrimmer trimmer = new OutlineTrimmer();
         root.accept(trimmer);
-        Contents content = new StringContent(Outline.encode(trimmer.getConverted()).toJSONString());
+        Contents content = new StringContent(Outlines.encode(trimmer.getConverted()).toJSONString());
 
         return new ProductMessage(
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                Product.OUTLINE,
-                Language.JSON,
+                Products.OUTLINE,
+                Languages.JSON,
                 content,
                 new ProductDependency(ast));
     }
@@ -61,23 +62,23 @@ public class ECMAScriptOutliner extends MontoService {
                     break;
 
                 case "Class":
-                    addVarToConverted(node, "class", IconType.EMPTY);
+                    addVarToConverted(node, "class", IconType.NO_IMG);
                     break;
 
                 case "Enum":
-                    addVarToConverted(node, "enum", IconType.EMPTY);
+                    addVarToConverted(node, "enum", IconType.NO_IMG);
                     break;
 
                 case "Const":
-                    addVarToConverted(node, "const", IconType.EMPTY);
+                    addVarToConverted(node, "const", IconType.NO_IMG);
                     break;
 
                 case "variableDeclaration":
-                    addVarToConverted(node, "var", IconType.EMPTY);
+                    addVarToConverted(node, "var", IconType.NO_IMG);
                     break;
 
                 case "functionDeclaration":
-                    addFuncToConverted(node, "function", IconType.EMPTY);
+                    addFuncToConverted(node, "function", IconType.NO_IMG);
                     break;
 
                 default:

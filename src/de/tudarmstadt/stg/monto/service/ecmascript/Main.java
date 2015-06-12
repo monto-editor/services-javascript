@@ -1,8 +1,6 @@
+package de.tudarmstadt.stg.monto.service.ecmascript;
+
 import de.tudarmstadt.stg.monto.service.MontoService;
-import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptCodeCompletion;
-import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptOutliner;
-import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptParser;
-import de.tudarmstadt.stg.monto.service.ecmascript.ECMAScriptTokenizer;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 
