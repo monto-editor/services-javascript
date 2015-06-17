@@ -1,11 +1,11 @@
-package de.tudarmstadt.stg.monto.service.ecmascript;
+package monto.service.ecmascript;
 
-import de.tudarmstadt.stg.monto.service.ast.*;
-import de.tudarmstadt.stg.monto.service.message.*;
-import de.tudarmstadt.stg.monto.service.outline.Outline;
-import de.tudarmstadt.stg.monto.service.outline.Outlines;
-import de.tudarmstadt.stg.monto.service.region.Region;
-import de.tudarmstadt.stg.monto.service.MontoService;
+import monto.service.ast.*;
+import monto.service.message.*;
+import monto.service.outline.Outline;
+import monto.service.outline.Outlines;
+import monto.service.region.Region;
+import monto.service.MontoService;
 import org.zeromq.ZMQ;
 
 import java.util.ArrayDeque;

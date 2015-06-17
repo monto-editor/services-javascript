@@ -1,11 +1,11 @@
-package de.tudarmstadt.stg.monto.service.ecmascript;
+package monto.service.ecmascript;
 
-import de.tudarmstadt.stg.monto.service.ecmascript.antlr.ECMAScriptLexer;
-import de.tudarmstadt.stg.monto.service.message.*;
-import de.tudarmstadt.stg.monto.service.MontoService;
-import de.tudarmstadt.stg.monto.service.token.Category;
-import de.tudarmstadt.stg.monto.service.token.Token;
-import de.tudarmstadt.stg.monto.service.token.Tokens;
+import monto.service.ecmascript.antlr.ECMAScriptLexer;
+import monto.service.message.*;
+import monto.service.MontoService;
+import monto.service.token.Category;
+import monto.service.token.Token;
+import monto.service.token.Tokens;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.zeromq.ZMQ;
 

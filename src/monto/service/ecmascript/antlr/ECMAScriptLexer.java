@@ -1,4 +1,4 @@
-package de.tudarmstadt.stg.monto.service.ecmascript.antlr;// Generated from ECMAScript.g4 by ANTLR 4.5
+package monto.service.ecmascript.antlr;// Generated from ECMAScript.g4 by ANTLR 4.5
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -222,7 +222,7 @@ public class ECMAScriptLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "de/tudarmstadt/stg/monto/service/ecmascript/antlr/ECMAScript.g4"; }
+	public String getGrammarFileName() { return "monto/service/ecmascript/antlr/ECMAScript.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

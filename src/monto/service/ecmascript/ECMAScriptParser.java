@@ -1,12 +1,13 @@
-package de.tudarmstadt.stg.monto.service.ecmascript;
+package monto.service.ecmascript;
 
-import de.tudarmstadt.stg.monto.service.ecmascript.antlr.ECMAScriptLexer;
-import de.tudarmstadt.stg.monto.service.ast.AST;
-import de.tudarmstadt.stg.monto.service.ast.ASTs;
-import de.tudarmstadt.stg.monto.service.ast.NonTerminal;
-import de.tudarmstadt.stg.monto.service.ast.Terminal;
-import de.tudarmstadt.stg.monto.service.message.*;
-import de.tudarmstadt.stg.monto.service.MontoService;
+import monto.service.ecmascript.antlr.ECMAScriptLexer;
+import monto.service.ast.AST;
+import monto.service.ast.ASTs;
+import monto.service.ast.NonTerminal;
+import monto.service.ast.Terminal;
+import monto.service.ecmascript.antlr.ECMAScriptLexer;
+import monto.service.message.*;
+import monto.service.MontoService;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -26,7 +27,7 @@ public class ECMAScriptParser extends MontoService {
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
     private CommonTokenStream tokens = new CommonTokenStream(lexer);
-    private de.tudarmstadt.stg.monto.service.ecmascript.antlr.ECMAScriptParser parser = new de.tudarmstadt.stg.monto.service.ecmascript.antlr.ECMAScriptParser(tokens);
+    private monto.service.ecmascript.antlr.ECMAScriptParser parser = new monto.service.ecmascript.antlr.ECMAScriptParser(tokens);
 
     public ECMAScriptParser(String address, ZMQ.Context context) {
         super(address, context);
@@ -63,7 +64,7 @@ public class ECMAScriptParser extends MontoService {
         @Override
         public void enterEveryRule(ParserRuleContext context) {
             if (context.getChildCount() > 0) {
-                String name = de.tudarmstadt.stg.monto.service.ecmascript.antlr.ECMAScriptParser.ruleNames[context.getRuleIndex()];
+                String name = monto.service.ecmascript.antlr.ECMAScriptParser.ruleNames[context.getRuleIndex()];
                 List<AST> childs = new ArrayList<>(context.getChildCount());
                 NonTerminal node = new NonTerminal(name, childs);
                 addChild(node);
