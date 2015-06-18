@@ -19,44 +19,37 @@ public class ECMAScriptCodeCompletion extends MontoService {
     }
 
     @Override
-    public ProductMessage onMessage(List<Message> messages) throws ParseException{
-        //TODO modify for javascript
+    public ProductMessage onMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
         ProductMessage ast = Messages.getProductMessage(messages, ECMAScriptServices.AST, ECMAScriptServices.JSON);
-
-        System.out.println(version.getSelections().toString());
 
         if (version.getSelections().size() > 0) {
             AST root = ASTs.decode(ast);
             List<Completion> allcompletions = allCompletions(version.getContent(), root);
             List<AST> selectedPath = selectedPath(root, version.getSelections().get(0));
 
-            if (selectedPath.size() > 0 && last(selectedPath) instanceof Terminal) {
-                Terminal terminalToBeCompleted = (Terminal) last(selectedPath);
-                String toBeCompleted = version.getContent().extract(terminalToBeCompleted).toString();
-                Stream<Completion> relevant =
-                        allcompletions
-                                .stream()
-                                .filter(comp -> comp.getReplacement().startsWith(toBeCompleted))
-                                .map(comp -> new Completion(
-                                        comp.getDescription() + ": " + comp.getReplacement(),
-                                        comp.getReplacement().substring(toBeCompleted.length()),
-                                        version.getSelections().get(0).getStartOffset(),
-                                        comp.getIcon()));
+            Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
+            String toBeCompleted = version.getContent().extract(terminalToBeCompleted).toString();
+            Stream<Completion> relevant =
+                    allcompletions
+                            .stream()
+                            .filter(comp -> comp.getReplacement().startsWith(toBeCompleted))
+                            .map(comp -> new Completion(
+                                    comp.getDescription() + ": " + comp.getReplacement(),
+                                    comp.getReplacement().substring(toBeCompleted.length()),
+                                    version.getSelections().get(0).getStartOffset(),
+                                    comp.getIcon()));
 
-                Contents content = new StringContent(Completions.encode(relevant).toJSONString());
-                return new ProductMessage(
-                        version.getVersionId(),
-                        new LongKey(1),
-                        version.getSource(),
-                        ECMAScriptServices.COMPLETIONS,
-                        ECMAScriptServices.JSON,
-                        content,
-                        new ProductDependency(ast));
-            }
-            throw new IllegalArgumentException(String.format("Last token in selection path is not a terminal: %s", selectedPath));
+            Contents content = new StringContent(Completions.encode(relevant).toJSONString());
+            return new ProductMessage(
+                    version.getVersionId(),
+                    new LongKey(1),
+                    version.getSource(),
+                    ECMAScriptServices.COMPLETIONS,
+                    ECMAScriptServices.JSON,
+                    content,
+                    new ProductDependency(ast));
         }
-
         throw new IllegalArgumentException("Code completion needs selection");
     }
 
@@ -70,7 +63,6 @@ public class ECMAScriptCodeCompletion extends MontoService {
 
         private List<Completion> completions = new ArrayList<>();
         private Contents content;
-        private boolean fieldDeclaration;
 
         public AllCompletions(Contents content) {
             this.content = content;
@@ -79,34 +71,41 @@ public class ECMAScriptCodeCompletion extends MontoService {
         @Override
         public void visit(NonTerminal node) {
             switch (node.getName()) {
-                case "normalClassDeclaration":
+                case "Class":
                     structureDeclaration(node, "class", IconType.NO_IMG);
                     break;
 
-                case "enumDeclaration":
+                case "Enum":
                     structureDeclaration(node, "enum", IconType.NO_IMG);
                     break;
 
-                case "enumConstant":
-                    leaf(node, "constant", IconType.NO_IMG);
+                case "Const":
+                    structureDeclaration(node, "const", IconType.NO_IMG);
                     break;
 
-                case "fieldDeclaration":
-                    fieldDeclaration = true;
-                    node.getChildren().forEach(child -> child.accept(this));
-                    fieldDeclaration = false;
-
-                case "variableDeclaratorId":
-                    if (fieldDeclaration)
-                        leaf(node, "field", IconType.NO_IMG);
+                case "variableDeclaration":
+                    structureDeclaration(node, "var", IconType.NO_IMG);
                     break;
 
-                case "methodDeclarator":
-                    leaf(node, "method", IconType.NO_IMG);
+                case "functionDeclaration":
+                    addFuncToConverted(node, "function", IconType.NO_IMG);
 
                 default:
                     node.getChildren().forEach(child -> child.accept(this));
             }
+        }
+
+        private void addFuncToConverted(NonTerminal node, String name, String icon) {
+            Object[] terminalChildren = node.getChildren()
+                    .stream()
+                    .filter(ast -> ast instanceof Terminal)
+                    .toArray();
+            if (terminalChildren.length > 1) {
+                Terminal structureIdent = (Terminal) terminalChildren[1];
+                completions.add(new Completion(name, content.extract(structureIdent).toString(), icon));
+
+            }
+            node.getChildren().forEach(child -> child.accept(this));
         }
 
         @Override
@@ -123,16 +122,6 @@ public class ECMAScriptCodeCompletion extends MontoService {
             completions.add(new Completion(name, content.extract(structureIdent).toString(), icon));
             node.getChildren().forEach(child -> child.accept(this));
         }
-
-        private void leaf(NonTerminal node, String name, String icon) {
-            AST ident = node
-                    .getChildren()
-                    .stream()
-                    .filter(ast -> ast instanceof Terminal)
-                    .findFirst().get();
-            completions.add(new Completion(name, content.extract(ident).toString(), icon));
-        }
-
 
         public List<Completion> getCompletions() {
             return completions;
@@ -156,11 +145,8 @@ public class ECMAScriptCodeCompletion extends MontoService {
 
         @Override
         public void visit(NonTerminal node) {
-            if (selection.inRange(node) || rightBehind(selection, node))
-                selectedPath.add(node);
             node.getChildren()
                     .stream()
-                    .filter(child -> selection.inRange(child) || rightBehind(selection, child))
                     .forEach(child -> child.accept(this));
         }
 
