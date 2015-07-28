@@ -38,6 +38,7 @@ public class ECMAScriptServices {
         services.add(new ECMAScriptParser(addr + 5011, context));
         services.add(new ECMAScriptOutliner(addr + 5012, context));
         services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
+//        services.add(new FlowTypeChecker(addr + 5014, context));
 
         for (MontoService service : services) {
             service.start();
