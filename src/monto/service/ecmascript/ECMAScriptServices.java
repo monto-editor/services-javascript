@@ -16,6 +16,7 @@ public class ECMAScriptServices {
     public static final Product AST = new Product("ast");
     public static final Product OUTLINE = new Product("outline");
     public static final Product COMPLETIONS = new Product("completions");
+    public static final Product ERRORS = new Product("errors");
 
     public static void main(String[] args) {
         String addr = "tcp://localhost:";
@@ -38,7 +39,7 @@ public class ECMAScriptServices {
         services.add(new ECMAScriptParser(addr + 5011, context));
         services.add(new ECMAScriptOutliner(addr + 5012, context));
         services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
-//        services.add(new FlowTypeChecker(addr + 5014, context));
+        services.add(new FlowTypeChecker(addr + 5014, context));
 
         for (MontoService service : services) {
             service.start();
