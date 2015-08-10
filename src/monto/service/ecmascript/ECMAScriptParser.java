@@ -1,13 +1,12 @@
 package monto.service.ecmascript;
 
-import monto.service.ecmascript.antlr.ECMAScriptLexer;
+import monto.service.MontoService;
 import monto.service.ast.AST;
 import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.ecmascript.antlr.ECMAScriptLexer;
 import monto.service.message.*;
-import monto.service.MontoService;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -15,7 +14,7 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -25,12 +24,15 @@ import java.util.List;
 
 public class ECMAScriptParser extends MontoService {
 
+    private static final Product AST = new Product("ast");
+    private static final Language JAVASCRIPT = new Language("javascript");
+
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
     private CommonTokenStream tokens = new CommonTokenStream(lexer);
     private monto.service.ecmascript.antlr.ECMAScriptParser parser = new monto.service.ecmascript.antlr.ECMAScriptParser(tokens);
 
-    public ECMAScriptParser(String address, ZMQ.Context context) {
-        super(address, context);
+    public ECMAScriptParser(ZContext context, String address, int registrationPort, String serviceID) {
+        super(context, address, registrationPort, serviceID, AST, JAVASCRIPT, new String[]{});
     }
 
     @Override
@@ -52,8 +54,8 @@ public class ECMAScriptParser extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                ECMAScriptServices.AST,
-                ECMAScriptServices.JSON,
+                AST,
+                JAVASCRIPT,
                 content);
     }
 

@@ -1,12 +1,15 @@
 package monto.service.ecmascript;
 
-import monto.service.ast.*;
+import monto.service.MontoService;
+import monto.service.ast.ASTVisitor;
+import monto.service.ast.ASTs;
+import monto.service.ast.NonTerminal;
+import monto.service.ast.Terminal;
 import monto.service.message.*;
 import monto.service.outline.Outline;
 import monto.service.outline.Outlines;
 import monto.service.region.Region;
-import monto.service.MontoService;
-import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -14,14 +17,18 @@ import java.util.List;
 
 public class ECMAScriptOutliner extends MontoService {
 
-    public ECMAScriptOutliner(String address, ZMQ.Context context) {
-        super(address, context);
+    private static final Product OUTLINE = new Product("outline");
+    private static final Product AST = new Product("ast");
+    private static final Language JAVASCRIPT = new Language("javascript");
+
+    public ECMAScriptOutliner(ZContext context, String address, int registrationPort, String serviceID) {
+        super(context, address, registrationPort, serviceID, OUTLINE, JAVASCRIPT, new String[]{"ast/javascript"});
     }
 
     @Override
     public ProductMessage onMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
-        ProductMessage ast = Messages.getProductMessage(messages, ECMAScriptServices.AST, ECMAScriptServices.JSON);
+        ProductMessage ast = Messages.getProductMessage(messages, AST, JAVASCRIPT);
 
         NonTerminal root = (NonTerminal) ASTs.decode(ast);
 
@@ -33,8 +40,8 @@ public class ECMAScriptOutliner extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                ECMAScriptServices.OUTLINE,
-                ECMAScriptServices.JSON,
+                OUTLINE,
+                JAVASCRIPT,
                 content,
                 new ProductDependency(ast));
     }

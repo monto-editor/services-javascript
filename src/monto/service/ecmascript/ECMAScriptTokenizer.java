@@ -1,13 +1,13 @@
 package monto.service.ecmascript;
 
+import monto.service.MontoService;
 import monto.service.ecmascript.antlr.ECMAScriptLexer;
 import monto.service.message.*;
-import monto.service.MontoService;
 import monto.service.token.Category;
 import monto.service.token.Token;
 import monto.service.token.Tokens;
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,10 +15,13 @@ import java.util.stream.Collectors;
 
 public class ECMAScriptTokenizer extends MontoService {
 
+    private static final Product TOKENS = new Product("tokens");
+    private static final Language JAVASCRIPT = new Language("javascript");
+
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
 
-    public ECMAScriptTokenizer(String address, ZMQ.Context context) {
-        super(address, context);
+    public ECMAScriptTokenizer(ZContext context, String address, int registrationPort, String serviceID) {
+        super(context, address, registrationPort, serviceID, TOKENS, JAVASCRIPT, new String[]{});
     }
 
     @Override
@@ -32,8 +35,8 @@ public class ECMAScriptTokenizer extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                ECMAScriptServices.TOKENS,
-                ECMAScriptServices.JSON,
+                TOKENS,
+                JAVASCRIPT,
                 contents
                 );
     }

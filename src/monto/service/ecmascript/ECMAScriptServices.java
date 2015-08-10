@@ -1,45 +1,37 @@
 package monto.service.ecmascript;
 
 import monto.service.MontoService;
-import monto.service.message.Language;
-import monto.service.message.Product;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
+import org.zeromq.ZContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ECMAScriptServices {
 
-    public static final Language JSON = new Language("json");
-    public static final Product TOKENS = new Product("tokens");
-    public static final Product AST = new Product("ast");
-    public static final Product OUTLINE = new Product("outline");
-    public static final Product COMPLETIONS = new Product("completions");
-    public static final Product ERRORS = new Product("errors");
+    private static final int regPort = 5009;
 
     public static void main(String[] args) {
+        ZContext context = new ZContext(1);
         String addr = "tcp://localhost:";
         List<MontoService> services = new ArrayList<>();
-        Context context = ZMQ.context(1);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 System.out.println("terminating...");
-                context.term();
                 for (MontoService service : services) {
                     service.stop();
                 }
-                System.out.println("terminated");
+                context.destroy();
+                System.out.println("everything terminated, good bye");
             }
         });
 
-        services.add(new ECMAScriptTokenizer(addr + 5010, context));
-        services.add(new ECMAScriptParser(addr + 5011, context));
-        services.add(new ECMAScriptOutliner(addr + 5012, context));
-        services.add(new ECMAScriptCodeCompletion(addr + 5013, context));
-        services.add(new FlowTypeChecker(addr + 5014, context));
+        services.add(new ECMAScriptTokenizer(context, addr, regPort, "ecmascriptTokenizer"));
+        services.add(new ECMAScriptParser(context, addr, regPort, "ecmascriptParser"));
+        services.add(new ECMAScriptOutliner(context, addr, regPort, "ecmascriptOutliner"));
+        services.add(new ECMAScriptCodeCompletion(context, addr, regPort, "ecmascriptCodeCompletioner"));
+        services.add(new FlowTypeChecker(context, addr, regPort, "ecmascriptFlowTypeChecker"));
 
         for (MontoService service : services) {
             service.start();

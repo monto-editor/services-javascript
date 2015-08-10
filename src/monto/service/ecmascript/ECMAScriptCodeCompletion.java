@@ -6,7 +6,7 @@ import monto.service.completion.Completion;
 import monto.service.completion.Completions;
 import monto.service.message.*;
 import monto.service.region.IRegion;
-import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +14,18 @@ import java.util.stream.Stream;
 
 public class ECMAScriptCodeCompletion extends MontoService {
 
-    public ECMAScriptCodeCompletion(String address, ZMQ.Context context) {
-        super(address, context);
+    private static final Product AST = new Product("ast");
+    private static final Product COMPLETIONS = new Product("completions");
+    private static final Language JAVASCRIPT = new Language("javascript");
+
+    public ECMAScriptCodeCompletion(ZContext context, String address, int registrationPort, String serviceID) {
+        super(context, address, registrationPort, serviceID, COMPLETIONS, JAVASCRIPT, new String[]{"ast/javascript"});
     }
 
     @Override
     public ProductMessage onMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
-        ProductMessage ast = Messages.getProductMessage(messages, ECMAScriptServices.AST, ECMAScriptServices.JSON);
+        ProductMessage ast = Messages.getProductMessage(messages, AST, JAVASCRIPT);
 
         if (version.getSelections().size() > 0) {
             AST root = ASTs.decode(ast);
@@ -45,8 +49,8 @@ public class ECMAScriptCodeCompletion extends MontoService {
                     version.getVersionId(),
                     new LongKey(1),
                     version.getSource(),
-                    ECMAScriptServices.COMPLETIONS,
-                    ECMAScriptServices.JSON,
+                    COMPLETIONS,
+                    JAVASCRIPT,
                     content,
                     new ProductDependency(ast));
         }

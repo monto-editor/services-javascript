@@ -4,7 +4,7 @@ import monto.service.MontoService;
 import monto.service.error.Error;
 import monto.service.error.Errors;
 import monto.service.message.*;
-import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -12,13 +12,16 @@ import java.util.List;
 
 public class FlowTypeChecker extends MontoService {
 
+    private static final Product ERRORS = new Product("errors");
+    private static final Language JAVASCRIPT = new Language("javascript");
+
     private String fileName;
     private File dir;
     private int[] linesizes;
     private List<Error> errors;
 
-    public FlowTypeChecker(String address, ZMQ.Context context) {
-        super(address, context);
+    public FlowTypeChecker(ZContext context, String address, int registrationPort, String serviceID) {
+        super(context, address, registrationPort, serviceID, ERRORS, JAVASCRIPT, new String[]{});
         fileName = "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
@@ -38,8 +41,8 @@ public class FlowTypeChecker extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                ECMAScriptServices.ERRORS,
-                ECMAScriptServices.JSON,
+                ERRORS,
+                JAVASCRIPT,
                 newContent);
     }
 
