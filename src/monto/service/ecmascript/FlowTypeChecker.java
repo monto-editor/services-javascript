@@ -93,6 +93,7 @@ public class FlowTypeChecker extends MontoService {
         bri.readLine();
         String input;
         while ((input = bri.readLine()) != null) {
+            System.out.println(input);
             if (input.startsWith("Found ")) {
                 break;
             } else if (input.equals("")) {
@@ -102,7 +103,7 @@ public class FlowTypeChecker extends MontoService {
                 description = new StringBuilder();
             } else {
                 String[] parts = input.split(":");
-                if (offset == -1) {
+                if (offset == -1 && parts.length > 2) {
                     String[] lengthParts = parts[2].split(",");
                     int begin = Integer.parseInt(lengthParts[0]);
                     int end = Integer.parseInt(lengthParts[1]);
