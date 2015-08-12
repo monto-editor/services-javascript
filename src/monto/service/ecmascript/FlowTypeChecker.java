@@ -21,7 +21,7 @@ public class FlowTypeChecker extends MontoService {
     private List<Error> errors;
 
     public FlowTypeChecker(ZContext context, String address, int registrationPort, String serviceID) {
-        super(context, address, registrationPort, serviceID, ERRORS, JAVASCRIPT, new String[]{});
+        super(context, address, registrationPort, serviceID, ERRORS, JAVASCRIPT, new String[]{"Source"});
         fileName = "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();

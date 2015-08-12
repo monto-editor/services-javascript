@@ -21,7 +21,7 @@ public class ECMAScriptTokenizer extends MontoService {
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
 
     public ECMAScriptTokenizer(ZContext context, String address, int registrationPort, String serviceID) {
-        super(context, address, registrationPort, serviceID, TOKENS, JAVASCRIPT, new String[]{});
+        super(context, address, registrationPort, serviceID, TOKENS, JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override

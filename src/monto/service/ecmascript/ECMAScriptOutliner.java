@@ -22,7 +22,7 @@ public class ECMAScriptOutliner extends MontoService {
     private static final Language JAVASCRIPT = new Language("javascript");
 
     public ECMAScriptOutliner(ZContext context, String address, int registrationPort, String serviceID) {
-        super(context, address, registrationPort, serviceID, OUTLINE, JAVASCRIPT, new String[]{"ast/javascript"});
+        super(context, address, registrationPort, serviceID, OUTLINE, JAVASCRIPT, new String[]{"Source","ast/javascript"});
     }
 
     @Override
