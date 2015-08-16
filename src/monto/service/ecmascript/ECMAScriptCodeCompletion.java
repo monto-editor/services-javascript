@@ -18,8 +18,8 @@ public class ECMAScriptCodeCompletion extends MontoService {
     private static final Product COMPLETIONS = new Product("completions");
     private static final Language JAVASCRIPT = new Language("javascript");
 
-    public ECMAScriptCodeCompletion(ZContext context, String address, int registrationPort, String serviceID) {
-        super(context, address, registrationPort, serviceID, COMPLETIONS, JAVASCRIPT, new String[]{"Source","ast/javascript"});
+    public ECMAScriptCodeCompletion(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, COMPLETIONS, JAVASCRIPT, new String[]{"Source","ast/javascript"});
     }
 
     @Override

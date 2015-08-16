@@ -1,6 +1,7 @@
 package monto.service.ecmascript;
 
 import monto.service.MontoService;
+import org.apache.commons.cli.*;
 import org.zeromq.ZContext;
 
 import java.util.ArrayList;
@@ -8,11 +9,10 @@ import java.util.List;
 
 public class ECMAScriptServices {
 
-    private static final int regPort = 5009;
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
+        String address = "tcp://*";
+        String regAddress = "tcp://*:5004";
         ZContext context = new ZContext(1);
-        String addr = "tcp://localhost:";
         List<MontoService> services = new ArrayList<>();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -27,11 +27,42 @@ public class ECMAScriptServices {
             }
         });
 
-        services.add(new ECMAScriptTokenizer(context, addr, regPort, "ecmascriptTokenizer"));
-        services.add(new ECMAScriptParser(context, addr, regPort, "ecmascriptParser"));
-        services.add(new ECMAScriptOutliner(context, addr, regPort, "ecmascriptOutliner"));
-        services.add(new ECMAScriptCodeCompletion(context, addr, regPort, "ecmascriptCodeCompletioner"));
-        services.add(new FlowTypeChecker(context, addr, regPort, "ecmascriptFlowTypeChecker"));
+        Options options = new Options();
+        options.addOption("t", false, "enable ecmascript tokenizer")
+                .addOption("p", false, "enable ecmascript parser")
+                .addOption("o", false, "enable ecmascript outliner")
+                .addOption("c", false, "enable ecmascript code completioner")
+                .addOption("f", false, "enable ecmascript FlowType checker")
+                .addOption("address", true, "address of services")
+                .addOption("registration", true, "address of broker registration");
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        if (cmd.hasOption("address")) {
+            address = cmd.getOptionValue("address");
+        }
+
+        if (cmd.hasOption("registration")) {
+            regAddress = cmd.getOptionValue("registration");
+        }
+
+
+        if (cmd.hasOption("t")) {
+            services.add(new ECMAScriptTokenizer(context, address, regAddress, "ecmascriptTokenizer"));
+        }
+        if (cmd.hasOption("p")) {
+            services.add(new ECMAScriptParser(context, address, regAddress, "ecmascriptParser"));
+        }
+        if (cmd.hasOption("o")) {
+            services.add(new ECMAScriptOutliner(context, address, regAddress, "ecmascriptOutliner"));
+        }
+        if (cmd.hasOption("c")) {
+            services.add(new ECMAScriptCodeCompletion(context, address, regAddress, "ecmascriptCodeCompletioner"));
+        }
+        if (cmd.hasOption("f")) {
+            services.add(new FlowTypeChecker(context, address, regAddress, "ecmascriptFlowTypeChecker"));
+        }
 
         for (MontoService service : services) {
             service.start();

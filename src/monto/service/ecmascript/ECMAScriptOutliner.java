@@ -21,8 +21,8 @@ public class ECMAScriptOutliner extends MontoService {
     private static final Product AST = new Product("ast");
     private static final Language JAVASCRIPT = new Language("javascript");
 
-    public ECMAScriptOutliner(ZContext context, String address, int registrationPort, String serviceID) {
-        super(context, address, registrationPort, serviceID, OUTLINE, JAVASCRIPT, new String[]{"Source","ast/javascript"});
+    public ECMAScriptOutliner(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, OUTLINE, JAVASCRIPT, new String[]{"Source","ast/javascript"});
     }
 
     @Override
