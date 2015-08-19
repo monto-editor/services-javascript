@@ -19,12 +19,22 @@ public class FlowTypeChecker extends MontoService {
     private File dir;
     private int[] linesizes;
     private List<Error> errors;
+    private String flowCmd;
 
     public FlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID) {
         super(context, address, registrationAddress, serviceID, ERRORS, JAVASCRIPT, new String[]{"Source"});
         fileName = "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("mac")) {
+            flowCmd = "flow_mac";
+        } else if (os.contains("win")) {
+            flowCmd = "";
+        } else {
+            flowCmd = "flow_linux";
+        }
+        createFlowConfig();
     }
 
     @Override
@@ -32,7 +42,6 @@ public class FlowTypeChecker extends MontoService {
         VersionMessage version = Messages.getVersionMessage(messages);
 
         createSourceFile(version.getContent());
-        createFlowConfig();
         runFlowTypecheck();
 
         Contents newContent = new StringContent(Errors.encode(errors.stream()).toJSONString());
@@ -62,14 +71,18 @@ public class FlowTypeChecker extends MontoService {
         writer.close();
     }
 
-    private void createFlowConfig() throws IOException, InterruptedException {
-        String[] cmd = new String[]{"/bin/sh", "-c", "./flow init"};
-        Process p = Runtime.getRuntime().exec(cmd, null, dir);
-        p.waitFor();
+    private void createFlowConfig() {
+        try {
+            String[] cmd = new String[]{"/bin/sh", "-c", "./" + flowCmd + " init"};
+            Process p = Runtime.getRuntime().exec(cmd, null, dir);
+            p.waitFor();
+        } catch (Exception e) {
+            System.out.println("FlowType could not be started");
+        }
     }
 
     private void runFlowTypecheck() throws IOException, InterruptedException {
-        String[] cmd = new String[]{"/bin/sh", "-c", "./flow check-contents < " + fileName};
+        String[] cmd = new String[]{"/bin/sh", "-c", "./" + flowCmd + " check-contents < " + fileName};
 
         Process p = Runtime.getRuntime().exec(cmd, null, dir);
         BufferedReader bri = new BufferedReader
