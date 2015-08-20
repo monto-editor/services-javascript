@@ -22,7 +22,7 @@ public class FlowTypeChecker extends MontoService {
     private String flowCmd;
 
     public FlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, ERRORS, JAVASCRIPT, new String[]{"Source"});
+        super(context, address, registrationAddress, serviceID, "FlowType", "A typechecker for JavaScript", ERRORS, JAVASCRIPT, new String[]{"Source"});
         fileName = "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();

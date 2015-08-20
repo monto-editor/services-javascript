@@ -32,7 +32,7 @@ public class ECMAScriptParser extends MontoService {
     private monto.service.ecmascript.antlr.ECMAScriptParser parser = new monto.service.ecmascript.antlr.ECMAScriptParser(tokens);
 
     public ECMAScriptParser(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, AST, JAVASCRIPT, new String[]{"Source"});
+        super(context, address, registrationAddress, serviceID, "ANTLR JavaScript Parser", "A parser that produces an AST for JavaScript using ANTLR", AST, JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
