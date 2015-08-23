@@ -27,6 +27,9 @@ public class ECMAScriptTokenizer extends MontoService {
     @Override
     public ProductMessage onMessage(List<Message> messages) throws IOException {
         VersionMessage version = Messages.getVersionMessage(messages);
+        if (!version.getLanguage().equals(JAVASCRIPT)) {
+            throw new IllegalArgumentException("wrong language in version message");
+        }
         lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
         Contents contents = new StringContent(Tokens.encode(tokens).toJSONString());

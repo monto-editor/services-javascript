@@ -40,7 +40,9 @@ public class FlowTypeChecker extends MontoService {
     @Override
     public ProductMessage onMessage(List<Message> messages) throws Exception {
         VersionMessage version = Messages.getVersionMessage(messages);
-
+        if (!version.getLanguage().equals(JAVASCRIPT)) {
+            throw new IllegalArgumentException("wrong language in version message");
+        }
         createSourceFile(version.getContent());
         runFlowTypecheck();
 

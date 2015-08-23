@@ -28,7 +28,13 @@ public class ECMAScriptOutliner extends MontoService {
     @Override
     public ProductMessage onMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
+        if (!version.getLanguage().equals(JAVASCRIPT)) {
+            throw new IllegalArgumentException("wrong language in version message");
+        }
         ProductMessage ast = Messages.getProductMessage(messages, AST, JAVASCRIPT);
+        if (!ast.getLanguage().equals(JAVASCRIPT)) {
+            throw new IllegalArgumentException("wrong language in ast product message");
+        }
 
         NonTerminal root = (NonTerminal) ASTs.decode(ast);
 
