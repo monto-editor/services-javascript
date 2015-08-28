@@ -22,8 +22,14 @@ public class ECMAScriptCodeCompletion extends MontoService {
         super(context, address, registrationAddress, serviceID, "Code Completion service for JavaScript", "A code completione service for JavaScript",  COMPLETIONS, JAVASCRIPT, new String[]{"Source","ast/javascript"});
     }
 
+    private static List<Completion> allCompletions(Contents contents, AST root) {
+        AllCompletions completionVisitor = new AllCompletions(contents);
+        root.accept(completionVisitor);
+        return completionVisitor.getCompletions();
+    }
+
     @Override
-    public ProductMessage onMessage(List<Message> messages) throws ParseException {
+    public ProductMessage onVersionMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
@@ -63,10 +69,9 @@ public class ECMAScriptCodeCompletion extends MontoService {
         throw new IllegalArgumentException("Code completion needs selection");
     }
 
-    private static List<Completion> allCompletions(Contents contents, AST root) {
-        AllCompletions completionVisitor = new AllCompletions(contents);
-        root.accept(completionVisitor);
-        return completionVisitor.getCompletions();
+    @Override
+    public void onConfigurationMessage(List<Message> list) throws Exception {
+
     }
 
     private static class AllCompletions implements ASTVisitor {

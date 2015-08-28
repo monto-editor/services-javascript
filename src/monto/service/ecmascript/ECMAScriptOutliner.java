@@ -1,10 +1,15 @@
 package monto.service.ecmascript;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import monto.service.MontoService;
 import monto.service.ast.ASTVisitor;
 import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
+import monto.service.configuration.BooleanOption;
+import monto.service.configuration.Configuration;
+import monto.service.configuration.NumberOption;
+import monto.service.configuration.Option;
 import monto.service.message.*;
 import monto.service.outline.Outline;
 import monto.service.outline.Outlines;
@@ -22,11 +27,12 @@ public class ECMAScriptOutliner extends MontoService {
     private static final Language JAVASCRIPT = new Language("javascript");
 
     public ECMAScriptOutliner(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Outline service for JavaScript", "An outline service for JavaScript",  OUTLINE, JAVASCRIPT, new String[]{"Source","ast/javascript"});
+        super(context, address, registrationAddress, serviceID, "Outline service for JavaScript", "An outline service for JavaScript", JAVASCRIPT, OUTLINE,
+                        new Option[]{new NumberOption("outline_depth", "Depth of Outline", 0.0, 0.0, 3.0)}, new String[]{"Source","ast/javascript"});
     }
 
     @Override
-    public ProductMessage onMessage(List<Message> messages) throws ParseException {
+    public ProductMessage onVersionMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
@@ -50,6 +56,12 @@ public class ECMAScriptOutliner extends MontoService {
                 JAVASCRIPT,
                 content,
                 new ProductDependency(ast));
+    }
+
+    @Override
+    public void onConfigurationMessage(List<Message> list) throws Exception {
+        ConfigurationMessage configMsg = Messages.getConfigurationMessage(list);
+        System.out.println(configMsg.getServiceID() + " -> " + configMsg.getConfigurations());
     }
 
     /**

@@ -25,7 +25,7 @@ public class ECMAScriptTokenizer extends MontoService {
     }
 
     @Override
-    public ProductMessage onMessage(List<Message> messages) throws IOException {
+    public ProductMessage onVersionMessage(List<Message> messages) throws IOException {
         VersionMessage version = Messages.getVersionMessage(messages);
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
@@ -41,7 +41,7 @@ public class ECMAScriptTokenizer extends MontoService {
                 TOKENS,
                 JAVASCRIPT,
                 contents
-                );
+        );
     }
 
     private Token convertToken(org.antlr.v4.runtime.Token token) {
@@ -189,4 +189,8 @@ public class ECMAScriptTokenizer extends MontoService {
         return new Token(offset, length, category);
     }
 
+    @Override
+    public void onConfigurationMessage(List<Message> list) throws Exception {
+
+    }
 }

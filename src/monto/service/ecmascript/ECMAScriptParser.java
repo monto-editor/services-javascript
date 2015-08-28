@@ -36,7 +36,7 @@ public class ECMAScriptParser extends MontoService {
     }
 
     @Override
-    public ProductMessage onMessage(List<Message> messages) throws IOException {
+    public ProductMessage onVersionMessage(List<Message> messages) throws IOException {
         VersionMessage version = Messages.getVersionMessage(messages);
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
@@ -60,6 +60,11 @@ public class ECMAScriptParser extends MontoService {
                 AST,
                 JAVASCRIPT,
                 content);
+    }
+
+    @Override
+    public void onConfigurationMessage(List<Message> list) throws Exception {
+
     }
 
     private static class Converter implements ParseTreeListener {
