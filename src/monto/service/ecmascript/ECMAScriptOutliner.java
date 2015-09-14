@@ -54,8 +54,7 @@ public class ECMAScriptOutliner extends MontoService {
 
     @Override
     public void onConfigurationMessage(List<Message> list) throws Exception {
-        ConfigurationMessage configMsg = Messages.getConfigurationMessage(list);
-        System.out.println(configMsg.getServiceID() + " -> " + configMsg.getConfigurations());
+
     }
 
     /**

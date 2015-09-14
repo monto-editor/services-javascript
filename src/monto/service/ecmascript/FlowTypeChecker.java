@@ -1,18 +1,26 @@
 package monto.service.ecmascript;
 
 import monto.service.MontoService;
+import monto.service.ast.ASTVisitor;
+import monto.service.ast.ASTs;
+import monto.service.ast.NonTerminal;
+import monto.service.ast.Terminal;
+import monto.service.configuration.*;
 import monto.service.error.Error;
 import monto.service.error.Errors;
 import monto.service.message.*;
+import monto.service.token.Category;
+import monto.service.token.Token;
+import monto.service.token.Tokens;
 import org.zeromq.ZContext;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class FlowTypeChecker extends MontoService {
 
     private static final Product ERRORS = new Product("errors");
+    private static final Product TOKENS = new Product("tokens");
     private static final Language JAVASCRIPT = new Language("javascript");
 
     private String fileName;
@@ -21,8 +29,22 @@ public class FlowTypeChecker extends MontoService {
     private List<Error> errors;
     private String flowCmd;
 
+    private boolean comments = true;
+    private String commentLanguage = "en_US";
+    private boolean strings = true;
+    private String stringLanguage = "en_US";
+    private boolean suggestions = false;
+    private int suggestionNumber = 5;
+
     public FlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "FlowType", "A typechecker for JavaScript", ERRORS, JAVASCRIPT, new String[]{"Source"});
+        super(context, address, registrationAddress, serviceID, "FlowType", "A typechecker for JavaScript", JAVASCRIPT, ERRORS, new Option[]{
+                new BooleanOption("comments", "Check comments", true),
+                new OptionGroup("comments", new Option[]{new XorOption("commentLanguage", "Language for comments", "en_US", Arrays.asList("en_US", "fr_FR", "de_DE", "es_ES"))}),
+                new BooleanOption("strings", "Check strings", true),
+                new OptionGroup("strings", new Option[]{new XorOption("stringLanguage", "Language for strings", "en_US", Arrays.asList("en_US", "fr_FR", "de_DE", "es_ES"))}),
+                new BooleanOption("suggestions", "Show suggestions", false),
+                new OptionGroup("suggestions", new Option[]{new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10)})
+        }, new String[]{"Source", "tokens/javascript"});
         fileName = "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
@@ -43,8 +65,16 @@ public class FlowTypeChecker extends MontoService {
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
+        ProductMessage tokensProduct = Messages.getProductMessage(messages, TOKENS, JAVASCRIPT);
+        if (!tokensProduct.getLanguage().equals(JAVASCRIPT)) {
+            throw new IllegalArgumentException("wrong language in tokens product message");
+        }
+
         createSourceFile(version.getContent());
         runFlowTypecheck();
+
+        List<Token> tokens = Tokens.decode(tokensProduct);
+        spellCheck(tokens, version.getContent().toString());
 
         Contents newContent = new StringContent(Errors.encode(errors.stream()).toJSONString());
 
@@ -58,8 +88,9 @@ public class FlowTypeChecker extends MontoService {
     }
 
     @Override
-    public void onConfigurationMessage(List<Message> list) throws Exception {
-
+    public void onConfigurationMessage(List<Message> messages) throws Exception {
+        ConfigurationMessage configMsg = Messages.getConfigurationMessage(messages);
+        System.out.println(configMsg.getConfigurations());
     }
 
     /*
@@ -113,11 +144,10 @@ public class FlowTypeChecker extends MontoService {
         bri.readLine();
         String input;
         while ((input = bri.readLine()) != null) {
-            System.out.println(input);
             if (input.startsWith("Found ")) {
                 break;
             } else if (input.equals("")) {
-                errors.add(new Error(offset, length, category, description.toString()));
+                errors.add(new Error(offset, length, "error", category, description.toString()));
                 offset = -1;
                 length = -1;
                 description = new StringBuilder();
@@ -152,7 +182,66 @@ public class FlowTypeChecker extends MontoService {
             builder.append(error);
         }
         error = builder.toString();
-        System.out.println(error);
+        if (!error.equals("")) {
+            System.out.println(error);
+        }
+        bre.close();
+    }
+
+    private void spellCheck(List<Token> tokens, String text) throws IOException, InterruptedException {
+        for (Token token : tokens) {
+            if (token.getCategory().equals(Category.COMMENT) || token.getCategory().equals(Category.STRING)) {
+                String tokenText = text.substring(token.getStartOffset(), token.getEndOffset());
+                String[] words = tokenText.split("\\s+");
+                for (String word : words) {
+                    String strippedWord = word.replaceAll("[^a-zA-Z]+", "");
+                    int offset = token.getStartOffset();
+                    offset += tokenText.indexOf(strippedWord);
+                    if (strippedWord == null || strippedWord.equals("")) {
+                        continue;
+                    }
+                    String[] cmd = new String[]{"/bin/sh", "-c", "echo " + strippedWord + " | aspell -a -d " + commentLanguage};
+
+                    Process p = Runtime.getRuntime().exec(cmd, null, dir);
+                    BufferedReader bri = new BufferedReader
+                            (new InputStreamReader(p.getInputStream()));
+                    BufferedReader bre = new BufferedReader
+                            (new InputStreamReader(p.getErrorStream()));
+
+                    handleAspellInput(bri, offset, strippedWord);
+                    handleAspellError(bre);
+
+                    p.waitFor();
+                }
+            }
+        }
+    }
+
+    private void handleAspellInput(BufferedReader bri, int offset, String word) throws IOException {
+        String category = "spelling";
+
+        bri.readLine();
+        String input;
+        while ((input = bri.readLine()) != null) {
+            if (input.startsWith("&")) {
+                String description = word + ", did you mean: " + input.split(": ")[1];
+                errors.add(new Error(offset, word.length(), "warning", category, description));
+            }
+        }
+        bri.close();
+    }
+
+    private void handleAspellError(BufferedReader bre) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        String error;
+        while ((error = bre.readLine()) != null) {
+            builder.append(error);
+        }
+
+        error = builder.toString();
+        if (!error.equals("")) {
+            System.out.println(error);
+        }
         bre.close();
     }
 }
