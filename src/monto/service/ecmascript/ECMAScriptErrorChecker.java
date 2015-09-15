@@ -1,10 +1,6 @@
 package monto.service.ecmascript;
 
 import monto.service.MontoService;
-import monto.service.ast.ASTVisitor;
-import monto.service.ast.ASTs;
-import monto.service.ast.NonTerminal;
-import monto.service.ast.Terminal;
 import monto.service.configuration.*;
 import monto.service.error.Error;
 import monto.service.error.Errors;
@@ -15,9 +11,11 @@ import monto.service.token.Tokens;
 import org.zeromq.ZContext;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class FlowTypeChecker extends MontoService {
+public class ECMAScriptErrorChecker extends MontoService {
 
     private static final Product ERRORS = new Product("errors");
     private static final Product TOKENS = new Product("tokens");
@@ -29,19 +27,26 @@ public class FlowTypeChecker extends MontoService {
     private List<Error> errors;
     private String flowCmd;
 
-    private boolean comments = true;
-    private String commentLanguage = "en_US";
-    private boolean strings = true;
-    private String stringLanguage = "en_US";
-    private boolean suggestions = false;
-    private int suggestionNumber = 5;
+    private static final boolean DEFAULT_comments = true;
+    private static final String DEFAULT_commentLanguage = "en";
+    private static final boolean DEFAULT_strings = true;
+    private static final String DEFAULT_stringLanguage = "en";
+    private static final boolean DEFAULT_suggestions = false;
+    private static final long DEFAULT_suggestionNumber = 5;
 
-    public FlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "FlowType", "A typechecker for JavaScript", JAVASCRIPT, ERRORS, new Option[]{
+    private boolean comments = DEFAULT_comments;
+    private String commentLanguage = DEFAULT_commentLanguage;
+    private boolean strings = DEFAULT_strings;
+    private String stringLanguage = DEFAULT_stringLanguage;
+    private boolean suggestions = DEFAULT_suggestions;
+    private long suggestionNumber = DEFAULT_suggestionNumber;
+
+    public ECMAScriptErrorChecker(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, "Error Checker for JavaScript", "Can check type errors using FlowType and check spelling using aspell", JAVASCRIPT, ERRORS, new Option[]{
                 new BooleanOption("comments", "Check comments", true),
-                new OptionGroup("comments", new Option[]{new XorOption("commentLanguage", "Language for comments", "en_US", Arrays.asList("en_US", "fr_FR", "de_DE", "es_ES"))}),
+                new OptionGroup("comments", new Option[]{new XorOption("commentLanguage", "Language for comments", "en", Arrays.asList("en", "fr", "de", "es"))}),
                 new BooleanOption("strings", "Check strings", true),
-                new OptionGroup("strings", new Option[]{new XorOption("stringLanguage", "Language for strings", "en_US", Arrays.asList("en_US", "fr_FR", "de_DE", "es_ES"))}),
+                new OptionGroup("strings", new Option[]{new XorOption("stringLanguage", "Language for strings", "en", Arrays.asList("en", "fr", "de", "es"))}),
                 new BooleanOption("suggestions", "Show suggestions", false),
                 new OptionGroup("suggestions", new Option[]{new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10)})
         }, new String[]{"Source", "tokens/javascript"});
@@ -90,7 +95,31 @@ public class FlowTypeChecker extends MontoService {
     @Override
     public void onConfigurationMessage(List<Message> messages) throws Exception {
         ConfigurationMessage configMsg = Messages.getConfigurationMessage(messages);
-        System.out.println(configMsg.getConfigurations());
+        List<Configuration> configs = Configurations.encode(configMsg.getConfigurations());
+        for (Configuration config : configs) {
+            switch (config.getOptionID()) {
+                case "comments":
+                    comments = (boolean) config.getValue();
+                    break;
+                case "commentLanguage":
+                    commentLanguage = (String) config.getValue();
+                    break;
+                case "strings":
+                    strings = (boolean) config.getValue();
+                    break;
+                case "stringLanguage":
+                    stringLanguage = (String) config.getValue();
+                    break;
+                case "suggestions":
+                    suggestions = (boolean) config.getValue();
+                    break;
+                case "suggestionNumber":
+                    suggestionNumber = (long) config.getValue();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /*
@@ -190,17 +219,17 @@ public class FlowTypeChecker extends MontoService {
 
     private void spellCheck(List<Token> tokens, String text) throws IOException, InterruptedException {
         for (Token token : tokens) {
-            if (token.getCategory().equals(Category.COMMENT) || token.getCategory().equals(Category.STRING)) {
+            if (token.getCategory().equals(Category.COMMENT) && comments || token.getCategory().equals(Category.STRING) && strings) {
                 String tokenText = text.substring(token.getStartOffset(), token.getEndOffset());
                 String[] words = tokenText.split("\\s+");
                 for (String word : words) {
                     String strippedWord = word.replaceAll("[^a-zA-Z]+", "");
                     int offset = token.getStartOffset();
                     offset += tokenText.indexOf(strippedWord);
-                    if (strippedWord == null || strippedWord.equals("")) {
+                    if (strippedWord.equals("")) {
                         continue;
                     }
-                    String[] cmd = new String[]{"/bin/sh", "-c", "echo " + strippedWord + " | aspell -a -d " + commentLanguage};
+                    String[] cmd = new String[]{"/bin/sh", "-c", "echo " + strippedWord + " | aspell -a -d " + (token.getCategory().equals(Category.COMMENT) ? commentLanguage : stringLanguage)};
 
                     Process p = Runtime.getRuntime().exec(cmd, null, dir);
                     BufferedReader bri = new BufferedReader
@@ -224,7 +253,15 @@ public class FlowTypeChecker extends MontoService {
         String input;
         while ((input = bri.readLine()) != null) {
             if (input.startsWith("&")) {
-                String description = word + ", did you mean: " + input.split(": ")[1];
+                String description = word;
+                if (suggestions && suggestionNumber > 0) {
+                    description += ", did you mean: ";
+                    String[] suggestions = input.split(": ")[1].split(", ");
+                    for (int i = 0; i < suggestionNumber && i < suggestions.length; i++) {
+                        description += suggestions[i] + ", ";
+                    }
+                    description = description.substring(0, description.length()-2);
+                };
                 errors.add(new Error(offset, word.length(), "warning", category, description));
             }
         }

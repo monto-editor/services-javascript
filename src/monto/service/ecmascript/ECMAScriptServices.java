@@ -61,7 +61,7 @@ public class ECMAScriptServices {
             services.add(new ECMAScriptCodeCompletion(context, address, regAddress, "ecmascriptCodeCompletioner"));
         }
         if (cmd.hasOption("f")) {
-            services.add(new FlowTypeChecker(context, address, regAddress, "ecmascriptFlowTypeChecker"));
+            services.add(new ECMAScriptErrorChecker(context, address, regAddress, "ecmascriptErrorChecker"));
         }
 
         for (MontoService service : services) {
