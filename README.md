@@ -4,7 +4,8 @@ Javascript Service for the Monto broker
 Running the service
 -------------------
 
-Run the jar file located in the dist folder
+1. Install aspell and the dictionaries of your choice
+2. Start services with `./start.sh`
 
 Options
 -------
@@ -12,6 +13,6 @@ Options
 * -p run the parser
 * -o run the outliner
 * -c run the code completioner
-* -f run the FlowType checker
+* -f run the error checker
 * -address run services on given address, for example `tcp://*`
 * -registration register on given address, for example `tcp://*:5004`

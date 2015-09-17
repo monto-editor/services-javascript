@@ -4,6 +4,7 @@ import monto.service.MontoService;
 import org.apache.commons.cli.*;
 import org.zeromq.ZContext;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class ECMAScriptServices {
     public static void main(String[] args) throws ParseException {
         String address = "tcp://*";
         String regAddress = "tcp://*:5004";
+        String flowLocation = "";
         ZContext context = new ZContext(1);
         List<MontoService> services = new ArrayList<>();
 
@@ -32,9 +34,10 @@ public class ECMAScriptServices {
                 .addOption("p", false, "enable ecmascript parser")
                 .addOption("o", false, "enable ecmascript outliner")
                 .addOption("c", false, "enable ecmascript code completioner")
-                .addOption("f", false, "enable ecmascript FlowType checker")
+                .addOption("f", false, "enable ecmascript FlowType type er ror checker")
                 .addOption("address", true, "address of services")
-                .addOption("registration", true, "address of broker registration");
+                .addOption("registration", true, "address of broker registration")
+                .addOption("flowlocation", true, "directory in which the flow binaries are located");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -45,6 +48,10 @@ public class ECMAScriptServices {
 
         if (cmd.hasOption("registration")) {
             regAddress = cmd.getOptionValue("registration");
+        }
+
+        if (cmd.hasOption("flowlocation")) {
+            flowLocation = cmd.getOptionValue("flowlocation");
         }
 
 
@@ -61,7 +68,11 @@ public class ECMAScriptServices {
             services.add(new ECMAScriptCodeCompletion(context, address, regAddress, "ecmascriptCodeCompletioner"));
         }
         if (cmd.hasOption("f")) {
-            services.add(new ECMAScriptErrorChecker(context, address, regAddress, "ecmascriptErrorChecker"));
+            try {
+                services.add(new ECMAScriptErrorChecker(context, address, regAddress, "ecmascriptErrorChecker", flowLocation, ECMAScriptErrorChecker.getAspellLanguages()));
+            } catch (IOException e) {
+                System.out.println("ECMAScriptErrorChecker could not be started: no aspell languages available");
+            }
         }
 
         for (MontoService service : services) {

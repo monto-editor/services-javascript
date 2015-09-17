@@ -12,7 +12,6 @@ import org.zeromq.ZContext;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ECMAScriptErrorChecker extends MontoService {
@@ -41,25 +40,25 @@ public class ECMAScriptErrorChecker extends MontoService {
     private boolean suggestions = DEFAULT_suggestions;
     private long suggestionNumber = DEFAULT_suggestionNumber;
 
-    public ECMAScriptErrorChecker(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Error Checker for JavaScript", "Can check type errors using FlowType and check spelling using aspell", JAVASCRIPT, ERRORS, new Option[]{
+    public ECMAScriptErrorChecker(ZContext context, String address, String registrationAddress, String serviceID, String flowLocation, List<String> languages) {
+        super(context, address, registrationAddress, serviceID, "Error Checker for JavaScript", "Can check type errors using FlowType and spelling using aspell", JAVASCRIPT, ERRORS, new Option[]{
                 new BooleanOption("comments", "Check comments", true),
-                new OptionGroup("comments", new Option[]{new XorOption("commentLanguage", "Language for comments", "en", Arrays.asList("en", "fr", "de", "es"))}),
+                new OptionGroup("comments", new Option[]{new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)}),
                 new BooleanOption("strings", "Check strings", true),
-                new OptionGroup("strings", new Option[]{new XorOption("stringLanguage", "Language for strings", "en", Arrays.asList("en", "fr", "de", "es"))}),
+                new OptionGroup("strings", new Option[]{new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)}),
                 new BooleanOption("suggestions", "Show suggestions", false),
                 new OptionGroup("suggestions", new Option[]{new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10)})
         }, new String[]{"Source", "tokens/javascript"});
-        fileName = "flowTypeCheckerFile.js";
+        fileName = flowLocation + "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("mac")) {
-            flowCmd = "flow_mac";
+            flowCmd = flowLocation + "flow_mac";
         } else if (os.contains("win")) {
             flowCmd = "";
         } else {
-            flowCmd = "flow_linux";
+            flowCmd = flowLocation + "flow_linux";
         }
         createFlowConfig();
     }
@@ -70,9 +69,10 @@ public class ECMAScriptErrorChecker extends MontoService {
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
+
         ProductMessage tokensProduct = Messages.getProductMessage(messages, TOKENS, JAVASCRIPT);
         if (!tokensProduct.getLanguage().equals(JAVASCRIPT)) {
-            throw new IllegalArgumentException("wrong language in tokens product message");
+            throw new IllegalArgumentException("wrong language in token product");
         }
 
         createSourceFile(version.getContent());
@@ -231,7 +231,7 @@ public class ECMAScriptErrorChecker extends MontoService {
                     }
                     String[] cmd = new String[]{"/bin/sh", "-c", "echo " + strippedWord + " | aspell -a -d " + (token.getCategory().equals(Category.COMMENT) ? commentLanguage : stringLanguage)};
 
-                    Process p = Runtime.getRuntime().exec(cmd, null, dir);
+                    Process p = Runtime.getRuntime().exec(cmd, null);
                     BufferedReader bri = new BufferedReader
                             (new InputStreamReader(p.getInputStream()));
                     BufferedReader bre = new BufferedReader
@@ -261,7 +261,7 @@ public class ECMAScriptErrorChecker extends MontoService {
                         description += suggestions[i] + ", ";
                     }
                     description = description.substring(0, description.length()-2);
-                };
+                }
                 errors.add(new Error(offset, word.length(), "warning", category, description));
             }
         }
@@ -280,5 +280,36 @@ public class ECMAScriptErrorChecker extends MontoService {
             System.out.println(error);
         }
         bre.close();
+    }
+
+    public static List<String> getAspellLanguages() throws IOException {
+        List<String> languages = new ArrayList<>();
+        String[] cmd = new String[]{"/bin/sh", "-c", "aspell dump dicts"};
+
+        Process p = Runtime.getRuntime().exec(cmd, null);
+        BufferedReader bri = new BufferedReader
+                (new InputStreamReader(p.getInputStream()));
+        BufferedReader bre = new BufferedReader
+                (new InputStreamReader(p.getErrorStream()));
+
+        String input;
+        while ((input = bri.readLine()) != null) {
+            languages.add(input);
+        }
+        bri.close();
+
+        StringBuilder builder = new StringBuilder();
+        String error;
+        while ((error = bre.readLine()) != null) {
+            builder.append(error);
+        }
+
+        error = builder.toString();
+        if (!error.equals("")) {
+            System.out.println(error);
+        }
+        bre.close();
+
+        return languages;
     }
 }
