@@ -95,7 +95,7 @@ public class ECMAScriptErrorChecker extends MontoService {
     @Override
     public void onConfigurationMessage(List<Message> messages) throws Exception {
         ConfigurationMessage configMsg = Messages.getConfigurationMessage(messages);
-        List<Configuration> configs = Configurations.encode(configMsg.getConfigurations());
+        List<Configuration> configs = configMsg.getConfigurations();
         for (Configuration config : configs) {
             switch (config.getOptionID()) {
                 case "comments":
