@@ -56,14 +56,13 @@ public class ECMAScriptCodeCompletion extends MontoService {
                                     version.getSelections().get(0).getStartOffset(),
                                     comp.getIcon()));
 
-            Contents content = new StringContent(Completions.encode(relevant).toJSONString());
             return new ProductMessage(
                     version.getVersionId(),
                     new LongKey(1),
                     version.getSource(),
                     COMPLETIONS,
                     JAVASCRIPT,
-                    content,
+                    Completions.encode(relevant),
                     new ProductDependency(ast));
         }
         throw new IllegalArgumentException("Code completion needs selection");

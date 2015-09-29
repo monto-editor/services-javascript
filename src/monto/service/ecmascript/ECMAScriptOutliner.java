@@ -40,7 +40,6 @@ public class ECMAScriptOutliner extends MontoService {
 
         OutlineTrimmer trimmer = new OutlineTrimmer();
         root.accept(trimmer);
-        Contents content = new StringContent(Outlines.encode(trimmer.getConverted()).toJSONString());
 
         return new ProductMessage(
                 version.getVersionId(),
@@ -48,7 +47,7 @@ public class ECMAScriptOutliner extends MontoService {
                 version.getSource(),
                 OUTLINE,
                 JAVASCRIPT,
-                content,
+                Outlines.encode(trimmer.getConverted()),
                 new ProductDependency(ast));
     }
 

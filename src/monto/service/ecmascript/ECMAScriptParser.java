@@ -51,15 +51,13 @@ public class ECMAScriptParser extends MontoService {
         Converter converter = new Converter();
         walker.walk(converter, root);
 
-        Contents content = ASTs.encode(converter.getRoot());
-
         return new ProductMessage(
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
                 AST,
                 JAVASCRIPT,
-                content);
+                ASTs.encode(converter.getRoot()));
     }
 
     @Override

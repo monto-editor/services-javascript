@@ -81,15 +81,13 @@ public class ECMAScriptErrorChecker extends MontoService {
         List<Token> tokens = Tokens.decode(tokensProduct);
         spellCheck(tokens, version.getContent().toString());
 
-        Contents newContent = new StringContent(Errors.encode(errors.stream()).toJSONString());
-
         return new ProductMessage(
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
                 ERRORS,
                 JAVASCRIPT,
-                newContent);
+                Errors.encode(errors.stream()));
     }
 
     @Override

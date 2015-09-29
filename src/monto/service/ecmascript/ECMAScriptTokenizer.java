@@ -32,7 +32,6 @@ public class ECMAScriptTokenizer extends MontoService {
         }
         lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
-        Contents contents = new StringContent(Tokens.encode(tokens).toJSONString());
 
         return new ProductMessage(
                 version.getVersionId(),
@@ -40,7 +39,7 @@ public class ECMAScriptTokenizer extends MontoService {
                 version.getSource(),
                 TOKENS,
                 JAVASCRIPT,
-                contents
+                Tokens.encode(tokens)
         );
     }
 
