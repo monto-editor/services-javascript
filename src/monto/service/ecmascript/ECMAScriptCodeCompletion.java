@@ -45,7 +45,13 @@ public class ECMAScriptCodeCompletion extends MontoService {
             List<AST> selectedPath = selectedPath(root, version.getSelections().get(0));
 
             Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
-            String toBeCompleted = version.getContent().extract(terminalToBeCompleted).toString();
+            String text = version.getContent().extract(terminalToBeCompleted).toString();
+            if (terminalToBeCompleted.getEndOffset() >= version.getSelections().get(0).getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelections().get(0).getStartOffset()) {
+                int vStart = version.getSelections().get(0).getStartOffset();
+                int tStart = terminalToBeCompleted.getStartOffset();
+                text = text.substring(0, vStart - tStart);
+            }
+            String toBeCompleted = text;
             Stream<Completion> relevant =
                     allcompletions
                             .stream()
@@ -176,7 +182,7 @@ public class ECMAScriptCodeCompletion extends MontoService {
 
         private static boolean rightBehind(IRegion region1, IRegion region2) {
             try {
-                return region1.getStartOffset() == region2.getEndOffset();
+                return region1.getStartOffset() <= region2.getEndOffset() && region1.getStartOffset() >= region2.getStartOffset();
             } catch (Exception e) {
                 return false;
             }
