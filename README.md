@@ -13,6 +13,7 @@ Options
 * -p run the parser
 * -o run the outliner
 * -c run the code completioner
-* -f run the error checker
+* -f run the FlowType type error checker
+* -s run the Aspell spelling error checker
 * -address run services on given address, for example `tcp://*`
 * -registration register on given address, for example `tcp://*:5004`

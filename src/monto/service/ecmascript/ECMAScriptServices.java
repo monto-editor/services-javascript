@@ -34,7 +34,8 @@ public class ECMAScriptServices {
                 .addOption("p", false, "enable ecmascript parser")
                 .addOption("o", false, "enable ecmascript outliner")
                 .addOption("c", false, "enable ecmascript code completioner")
-                .addOption("f", false, "enable ecmascript FlowType type er ror checker")
+                .addOption("f", false, "enable ecmascript FlowType type error checker")
+                .addOption("s", false, "enable ecmascript Aspell spelling error checker")
                 .addOption("address", true, "address of services")
                 .addOption("registration", true, "address of broker registration")
                 .addOption("flowlocation", true, "directory in which the flow binaries are located");
@@ -68,10 +69,13 @@ public class ECMAScriptServices {
             services.add(new ECMAScriptCodeCompletion(context, address, regAddress, "ecmascriptCodeCompletioner"));
         }
         if (cmd.hasOption("f")) {
+            services.add(new ECMAScriptFlowTypeChecker(context, address, regAddress, "ecmascriptFlowTypeChecker", flowLocation));
+        }
+        if (cmd.hasOption("s")) {
             try {
-                services.add(new ECMAScriptErrorChecker(context, address, regAddress, "ecmascriptErrorChecker", flowLocation, ECMAScriptErrorChecker.getAspellLanguages()));
+                services.add(new AspellSpellChecker(context, address, regAddress, "aspellSpellChecker", AspellSpellChecker.getAspellLanguages()));
             } catch (IOException e) {
-                System.out.println("ECMAScriptErrorChecker could not be started: no aspell languages available");
+                System.out.println("AspellSpellChecker could not be started: no aspell languages available");
             }
         }
 
