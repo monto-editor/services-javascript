@@ -22,7 +22,7 @@ public class ECMAScriptOutliner extends MontoService {
     private static final Language JAVASCRIPT = new Language("javascript");
 
     public ECMAScriptOutliner(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Outline service for JavaScript", "An outline service for JavaScript", OUTLINE, JAVASCRIPT, new String[]{"Source","ast/javascript"});
+        super(context, address, registrationAddress, serviceID, "Outline service for JavaScript", "An outline service for JavaScript", OUTLINE, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
     @Override
@@ -130,7 +130,6 @@ public class ECMAScriptOutliner extends MontoService {
                 node.getChildren().forEach(child -> child.accept(this));
                 converted.pop();
             }
-            ;
         }
 
         @Override

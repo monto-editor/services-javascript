@@ -148,7 +148,7 @@ public class AspellSpellChecker extends MontoService {
                     for (int i = 0; i < suggestionNumber && i < suggestions.length; i++) {
                         description += suggestions[i] + ", ";
                     }
-                    description = description.substring(0, description.length()-2);
+                    description = description.substring(0, description.length() - 2);
                 }
                 errors.add(new Error(offset, word.length(), "warning", category, description));
             }

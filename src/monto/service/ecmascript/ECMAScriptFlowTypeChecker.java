@@ -23,7 +23,6 @@ public class ECMAScriptFlowTypeChecker extends MontoService {
     private String flowCmd;
 
 
-
     public ECMAScriptFlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID, String flowLocation) {
         super(context, address, registrationAddress, serviceID, "Error Checker for JavaScript", "Can check type errors using FlowType", JAVASCRIPT, ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
         fileName = flowLocation + "flowTypeCheckerFile.js";
