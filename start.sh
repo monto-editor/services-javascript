@@ -1,4 +1,4 @@
-java -jar dist/services-javascript.jar \
+JAVA_HOME/bin/java -jar dist/services-javascript.jar \
     -t -p -o -c -f -s \
     -address tcp://* \
     -registration tcp://*:5004 \
