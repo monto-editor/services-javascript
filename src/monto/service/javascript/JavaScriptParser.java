@@ -1,11 +1,11 @@
-package monto.service.ecmascript;
+package monto.service.javascript;
 
 import monto.service.MontoService;
 import monto.service.ast.AST;
 import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
-import monto.service.ecmascript.antlr.ECMAScriptLexer;
+import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.message.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,17 +22,17 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-public class ECMAScriptParser extends MontoService {
+public class JavaScriptParser extends MontoService {
 
     private static final Product AST = new Product("ast");
     private static final Language JAVASCRIPT = new Language("javascript");
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
     private CommonTokenStream tokens = new CommonTokenStream(lexer);
-    private monto.service.ecmascript.antlr.ECMAScriptParser parser = new monto.service.ecmascript.antlr.ECMAScriptParser(tokens);
+    private monto.service.javascript.antlr.ECMAScriptParser parser = new monto.service.javascript.antlr.ECMAScriptParser(tokens);
 
-    public ECMAScriptParser(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "ANTLR JavaScript Parser", "A parser that produces an AST for JavaScript using ANTLR", AST, JAVASCRIPT, new String[]{"Source"});
+    public JavaScriptParser(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, "Parser", "A parser that produces an AST for JavaScript using ANTLR", AST, JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ECMAScriptParser extends MontoService {
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
-        lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
+        lexer.setInputStream(new ANTLRInputStream(version.getContent()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         parser.setTokenStream(tokens);
@@ -72,7 +72,7 @@ public class ECMAScriptParser extends MontoService {
         @Override
         public void enterEveryRule(ParserRuleContext context) {
             if (context.getChildCount() > 0) {
-                String name = monto.service.ecmascript.antlr.ECMAScriptParser.ruleNames[context.getRuleIndex()];
+                String name = monto.service.javascript.antlr.ECMAScriptParser.ruleNames[context.getRuleIndex()];
                 List<AST> childs = new ArrayList<>(context.getChildCount());
                 NonTerminal node = new NonTerminal(name, childs);
                 addChild(node);

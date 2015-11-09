@@ -1,14 +1,19 @@
-package monto.service.ecmascript;
-
-import monto.service.MontoService;
-import org.apache.commons.cli.*;
-import org.zeromq.ZContext;
+package monto.service.javascript;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ECMAScriptServices {
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.zeromq.ZContext;
+
+import monto.service.MontoService;
+
+public class JavaScriptServices {
 
     public static void main(String[] args) throws ParseException {
         String address = "tcp://*";
@@ -30,12 +35,12 @@ public class ECMAScriptServices {
         });
 
         Options options = new Options();
-        options.addOption("t", false, "enable ecmascript tokenizer")
-                .addOption("p", false, "enable ecmascript parser")
-                .addOption("o", false, "enable ecmascript outliner")
-                .addOption("c", false, "enable ecmascript code completioner")
-                .addOption("f", false, "enable ecmascript FlowType type error checker")
-                .addOption("s", false, "enable ecmascript Aspell spelling error checker")
+        options.addOption("t", false, "enable javascript tokenizer")
+                .addOption("p", false, "enable javascript parser")
+                .addOption("o", false, "enable javascript outliner")
+                .addOption("c", false, "enable javascript code completioner")
+                .addOption("f", false, "enable javascript FlowType type error checker")
+                .addOption("s", false, "enable javascript Aspell spelling error checker")
                 .addOption("address", true, "address of services")
                 .addOption("registration", true, "address of broker registration")
                 .addOption("flowlocation", true, "directory in which the flow binaries are located");
@@ -57,19 +62,19 @@ public class ECMAScriptServices {
 
 
         if (cmd.hasOption("t")) {
-            services.add(new ECMAScriptTokenizer(context, address, regAddress, "ecmascriptTokenizer"));
+            services.add(new JavaScriptTokenizer(context, address, regAddress, "javascriptTokenizer"));
         }
         if (cmd.hasOption("p")) {
-            services.add(new ECMAScriptParser(context, address, regAddress, "ecmascriptParser"));
+            services.add(new JavaScriptParser(context, address, regAddress, "javascriptParser"));
         }
         if (cmd.hasOption("o")) {
-            services.add(new ECMAScriptOutliner(context, address, regAddress, "ecmascriptOutliner"));
+            services.add(new JavaScriptOutliner(context, address, regAddress, "javascriptOutliner"));
         }
         if (cmd.hasOption("c")) {
-            services.add(new ECMAScriptCodeCompletion(context, address, regAddress, "ecmascriptCodeCompletioner"));
+            services.add(new JavaScriptCodeCompletion(context, address, regAddress, "javascriptCompletioner"));
         }
         if (cmd.hasOption("f")) {
-            services.add(new ECMAScriptFlowTypeChecker(context, address, regAddress, "ecmascriptFlowTypeChecker", flowLocation));
+            services.add(new JavaScriptFlowTypeChecker(context, address, regAddress, "javascriptFlowTypeChecker", flowLocation));
         }
         if (cmd.hasOption("s")) {
             try {

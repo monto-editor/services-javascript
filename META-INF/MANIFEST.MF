@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: services-javascript
+Bundle-SymbolicName: services-javascript
+Bundle-Version: 1.0.0.qualifier
+Export-Package: monto.service.javascript,
+ monto.service.javascript.antlr
+Require-Bundle: servies-base-java;bundle-version="1.0.0"

@@ -1,7 +1,7 @@
-package monto.service.ecmascript;
+package monto.service.javascript;
 
 import monto.service.MontoService;
-import monto.service.ecmascript.antlr.ECMAScriptLexer;
+import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.message.*;
 import monto.service.token.Category;
 import monto.service.token.Token;
@@ -13,15 +13,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ECMAScriptTokenizer extends MontoService {
+public class JavaScriptTokenizer extends MontoService {
 
     private static final Product TOKENS = new Product("tokens");
     private static final Language JAVASCRIPT = new Language("javascript");
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
 
-    public ECMAScriptTokenizer(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "ANTLR Tokenizer for JavaScript", "A tokenizer for JavaScript that uses ANTLR for tokenizing", TOKENS, JAVASCRIPT, new String[]{"Source"});
+    public JavaScriptTokenizer(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, "Tokenizer", "A tokenizer for JavaScript that uses ANTLR for tokenizing", TOKENS, JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ECMAScriptTokenizer extends MontoService {
         if (!version.getLanguage().equals(JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
-        lexer.setInputStream(new ANTLRInputStream(version.getContent().getReader()));
+        lexer.setInputStream(new ANTLRInputStream(version.getContent()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
 
         return new ProductMessage(

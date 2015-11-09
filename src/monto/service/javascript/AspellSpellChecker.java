@@ -1,4 +1,4 @@
-package monto.service.ecmascript;
+package monto.service.javascript;
 
 import monto.service.MontoService;
 import monto.service.configuration.*;
@@ -39,13 +39,13 @@ public class AspellSpellChecker extends MontoService {
     private long suggestionNumber = DEFAULT_suggestionNumber;
 
     public AspellSpellChecker(ZContext context, String address, String registrationAddress, String serviceID, List<String> languages) {
-        super(context, address, registrationAddress, serviceID, "Error Spell checker for several language", "Can check spelling errors using aspell", JAVASCRIPT, ERRORS, new Option[]{
+        super(context, address, registrationAddress, serviceID, "Spell checker", "Can check spelling errors using aspell", JAVASCRIPT, ERRORS, new Option[]{
                 new BooleanOption("comments", "Check comments", true),
-                new OptionGroup("comments", new Option[]{new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)}),
+                new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
                 new BooleanOption("strings", "Check strings", true),
-                new OptionGroup("strings", new Option[]{new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)}),
+                new OptionGroup("strings", new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)),
                 new BooleanOption("suggestions", "Show suggestions", false),
-                new OptionGroup("suggestions", new Option[]{new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10)})
+                new OptionGroup("suggestions", new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10))
         }, new String[]{"Source", "tokens/javascript"});
         errors = new ArrayList<>();
     }

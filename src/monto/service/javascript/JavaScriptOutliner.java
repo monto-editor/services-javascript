@@ -1,28 +1,38 @@
-package monto.service.ecmascript;
+package monto.service.javascript;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+
+import org.zeromq.ZContext;
 
 import monto.service.MontoService;
 import monto.service.ast.ASTVisitor;
 import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
-import monto.service.message.*;
+import monto.service.message.IconType;
+import monto.service.message.Language;
+import monto.service.message.LongKey;
+import monto.service.message.Message;
+import monto.service.message.Messages;
+import monto.service.message.ParseException;
+import monto.service.message.Product;
+import monto.service.message.ProductDependency;
+import monto.service.message.ProductMessage;
+import monto.service.message.VersionMessage;
 import monto.service.outline.Outline;
 import monto.service.outline.Outlines;
 import monto.service.region.Region;
-import org.zeromq.ZContext;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-
-public class ECMAScriptOutliner extends MontoService {
+public class JavaScriptOutliner extends MontoService {
 
     private static final Product OUTLINE = new Product("outline");
     private static final Product AST = new Product("ast");
     private static final Language JAVASCRIPT = new Language("javascript");
 
-    public ECMAScriptOutliner(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Outline service for JavaScript", "An outline service for JavaScript", OUTLINE, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+    public JavaScriptOutliner(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, "Outline", "An outline service for JavaScript", OUTLINE, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
     @Override

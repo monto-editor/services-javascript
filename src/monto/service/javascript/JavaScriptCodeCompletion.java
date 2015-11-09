@@ -1,28 +1,43 @@
-package monto.service.ecmascript;
-
-import monto.service.MontoService;
-import monto.service.ast.*;
-import monto.service.completion.Completion;
-import monto.service.completion.Completions;
-import monto.service.message.*;
-import monto.service.region.IRegion;
-import org.zeromq.ZContext;
+package monto.service.javascript;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ECMAScriptCodeCompletion extends MontoService {
+import org.zeromq.ZContext;
+
+import monto.service.MontoService;
+import monto.service.ast.AST;
+import monto.service.ast.ASTVisitor;
+import monto.service.ast.ASTs;
+import monto.service.ast.NonTerminal;
+import monto.service.ast.Terminal;
+import monto.service.completion.Completion;
+import monto.service.completion.Completions;
+import monto.service.message.IconType;
+import monto.service.message.Language;
+import monto.service.message.LongKey;
+import monto.service.message.Message;
+import monto.service.message.Messages;
+import monto.service.message.ParseException;
+import monto.service.message.Product;
+import monto.service.message.ProductDependency;
+import monto.service.message.ProductMessage;
+import monto.service.message.Selection;
+import monto.service.message.VersionMessage;
+import monto.service.region.IRegion;
+
+public class JavaScriptCodeCompletion extends MontoService {
 
     private static final Product AST = new Product("ast");
     private static final Product COMPLETIONS = new Product("completions");
     private static final Language JAVASCRIPT = new Language("javascript");
 
-    public ECMAScriptCodeCompletion(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Code Completion service for JavaScript", "A code completione service for JavaScript", COMPLETIONS, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+    public JavaScriptCodeCompletion(ZContext context, String address, String registrationAddress, String serviceID) {
+        super(context, address, registrationAddress, serviceID, "Code Completion", "A code completion service for JavaScript", COMPLETIONS, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
-    private static List<Completion> allCompletions(Contents contents, AST root) {
+    private static List<Completion> allCompletions(String contents, AST root) {
         AllCompletions completionVisitor = new AllCompletions(contents);
         root.accept(completionVisitor);
         return completionVisitor.getCompletions();
@@ -45,7 +60,7 @@ public class ECMAScriptCodeCompletion extends MontoService {
             List<AST> selectedPath = selectedPath(root, version.getSelections().get(0));
 
             Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
-            String text = version.getContent().extract(terminalToBeCompleted).toString();
+            String text = extract(version.getContent(),terminalToBeCompleted).toString();
             if (terminalToBeCompleted.getEndOffset() >= version.getSelections().get(0).getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelections().get(0).getStartOffset()) {
                 int vStart = version.getSelections().get(0).getStartOffset();
                 int tStart = terminalToBeCompleted.getStartOffset();
@@ -82,9 +97,9 @@ public class ECMAScriptCodeCompletion extends MontoService {
     private static class AllCompletions implements ASTVisitor {
 
         private List<Completion> completions = new ArrayList<>();
-        private Contents content;
+        private String content;
 
-        public AllCompletions(Contents content) {
+        public AllCompletions(String content) {
             this.content = content;
         }
 
@@ -122,7 +137,7 @@ public class ECMAScriptCodeCompletion extends MontoService {
                     .toArray();
             if (terminalChildren.length > 1) {
                 Terminal structureIdent = (Terminal) terminalChildren[1];
-                completions.add(new Completion(name, content.extract(structureIdent).toString(), icon));
+                completions.add(new Completion(name, extract(content,structureIdent).toString(), icon));
 
             }
             node.getChildren().forEach(child -> child.accept(this));
@@ -139,7 +154,7 @@ public class ECMAScriptCodeCompletion extends MontoService {
                     .stream()
                     .filter(ast -> ast instanceof Terminal)
                     .reduce((previous, current) -> current).get();
-            completions.add(new Completion(name, content.extract(structureIdent).toString(), icon));
+            completions.add(new Completion(name, extract(content,structureIdent).toString(), icon));
             node.getChildren().forEach(child -> child.accept(this));
         }
 
@@ -190,7 +205,8 @@ public class ECMAScriptCodeCompletion extends MontoService {
 
     }
 
-    private static <A> A last(List<A> list) {
-        return list.get(list.size() - 1);
+
+    private static String extract(String str, AST indent) {
+    	return str.subSequence(indent.getStartOffset(), indent.getStartOffset()+indent.getLength()).toString();
     }
 }

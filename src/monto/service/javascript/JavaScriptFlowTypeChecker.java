@@ -1,4 +1,4 @@
-package monto.service.ecmascript;
+package monto.service.javascript;
 
 import monto.service.MontoService;
 import monto.service.configuration.*;
@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ECMAScriptFlowTypeChecker extends MontoService {
+public class JavaScriptFlowTypeChecker extends MontoService {
 
     private static final Product ERRORS = new Product("errors");
     private static final Language JAVASCRIPT = new Language("javascript");
@@ -23,8 +23,8 @@ public class ECMAScriptFlowTypeChecker extends MontoService {
     private String flowCmd;
 
 
-    public ECMAScriptFlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID, String flowLocation) {
-        super(context, address, registrationAddress, serviceID, "Error Checker for JavaScript", "Can check type errors using FlowType", JAVASCRIPT, ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
+    public JavaScriptFlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID, String flowLocation) {
+        super(context, address, registrationAddress, serviceID, "Error Checker", "Can check type errors using FlowType", JAVASCRIPT, ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
         fileName = flowLocation + "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
@@ -68,8 +68,8 @@ public class ECMAScriptFlowTypeChecker extends MontoService {
      * Creates a file of the source content that later can be checked with flowtype.
      * Also sets linesizes to the bounds of source content.
      */
-    private void createSourceFile(Contents content) throws FileNotFoundException, UnsupportedEncodingException {
-        String[] lines = content.toString().split("\n");
+    private void createSourceFile(String content) throws FileNotFoundException, UnsupportedEncodingException {
+        String[] lines = content.split("\n");
         linesizes = new int[lines.length];
         for (int i = 0; i < lines.length; i++) {
             linesizes[i] = lines[i].length();

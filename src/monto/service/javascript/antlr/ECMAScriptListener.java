@@ -1,4 +1,4 @@
-package monto.service.ecmascript.antlr;// Generated from ECMAScript.g4 by ANTLR 4.5
+package monto.service.javascript.antlr;// Generated from ECMAScript.g4 by ANTLR 4.5
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
