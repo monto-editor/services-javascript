@@ -1,15 +1,27 @@
 package monto.service.javascript;
 
-import monto.service.MontoService;
-import monto.service.configuration.*;
-import monto.service.error.Error;
-import monto.service.error.Errors;
-import monto.service.message.*;
-import org.zeromq.ZContext;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
+import monto.service.configuration.Option;
+import monto.service.error.Error;
+import monto.service.error.Errors;
+import monto.service.message.Language;
+import monto.service.message.LongKey;
+import monto.service.message.Message;
+import monto.service.message.Messages;
+import monto.service.message.Product;
+import monto.service.message.ProductMessage;
+import monto.service.message.VersionMessage;
 
 public class JavaScriptFlowTypeChecker extends MontoService {
 
@@ -23,8 +35,8 @@ public class JavaScriptFlowTypeChecker extends MontoService {
     private String flowCmd;
 
 
-    public JavaScriptFlowTypeChecker(ZContext context, String address, String registrationAddress, String serviceID, String flowLocation) {
-        super(context, address, registrationAddress, serviceID, "Error Checker", "Can check type errors using FlowType", JAVASCRIPT, ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
+    public JavaScriptFlowTypeChecker(ZMQConfiguration zmqConfig, String flowLocation) {
+        super(zmqConfig, "javascriptFlowTypeChecker", "Error Checker", "Can check type errors using FlowType", JAVASCRIPT, ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
         fileName = flowLocation + "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
@@ -57,11 +69,6 @@ public class JavaScriptFlowTypeChecker extends MontoService {
                 ERRORS,
                 JAVASCRIPT,
                 Errors.encode(errors.stream()));
-    }
-
-    @Override
-    public void onConfigurationMessage(List<Message> messages) throws Exception {
-
     }
 
     /*

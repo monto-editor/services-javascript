@@ -1,20 +1,32 @@
 package monto.service.javascript;
 
-import monto.service.MontoService;
-import monto.service.configuration.*;
-import monto.service.error.*;
-import monto.service.error.Error;
-import monto.service.message.*;
-import monto.service.token.Category;
-import monto.service.token.Token;
-import monto.service.token.Tokens;
-import org.zeromq.ZContext;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
+import monto.service.configuration.BooleanOption;
+import monto.service.configuration.Configuration;
+import monto.service.configuration.NumberOption;
+import monto.service.configuration.Option;
+import monto.service.configuration.OptionGroup;
+import monto.service.configuration.XorOption;
+import monto.service.error.Error;
+import monto.service.error.Errors;
+import monto.service.message.ConfigurationMessage;
+import monto.service.message.Language;
+import monto.service.message.LongKey;
+import monto.service.message.Message;
+import monto.service.message.Messages;
+import monto.service.message.Product;
+import monto.service.message.ProductMessage;
+import monto.service.message.VersionMessage;
+import monto.service.token.Category;
+import monto.service.token.Token;
+import monto.service.token.Tokens;
 
 public class AspellSpellChecker extends MontoService {
 
@@ -38,8 +50,8 @@ public class AspellSpellChecker extends MontoService {
     private boolean suggestions = DEFAULT_suggestions;
     private long suggestionNumber = DEFAULT_suggestionNumber;
 
-    public AspellSpellChecker(ZContext context, String address, String registrationAddress, String serviceID, List<String> languages) {
-        super(context, address, registrationAddress, serviceID, "Spell checker", "Can check spelling errors using aspell", JAVASCRIPT, ERRORS, new Option[]{
+    public AspellSpellChecker(ZMQConfiguration zmqConfig, List<String> languages) {
+        super(zmqConfig, "aspellSpellChecker", "Spell checker", "Can check spelling errors using aspell", JAVASCRIPT, ERRORS, new Option[]{
                 new BooleanOption("comments", "Check comments", true),
                 new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
                 new BooleanOption("strings", "Check strings", true),
@@ -75,11 +87,10 @@ public class AspellSpellChecker extends MontoService {
                 Errors.encode(errors.stream()));
     }
 
-    @Override
-    public void onConfigurationMessage(List<Message> messages) throws Exception {
-        ConfigurationMessage configMsg = Messages.getConfigurationMessage(messages);
-        List<Configuration> configs = configMsg.getConfigurations();
-        for (Configuration config : configs) {
+    @SuppressWarnings("rawtypes")
+	@Override
+    public void onConfigurationMessage(ConfigurationMessage message) throws Exception {
+        for (Configuration config : message.getConfigurations()) {
             switch (config.getOptionID()) {
                 case "comments":
                     comments = (boolean) config.getValue();
@@ -172,7 +183,7 @@ public class AspellSpellChecker extends MontoService {
 
     public static List<String> getAspellLanguages() throws IOException {
         List<String> languages = new ArrayList<>();
-        String[] cmd = new String[]{"/bin/sh", "-c", "aspell dump dicts"};
+        String[] cmd = new String[]{"aspell", "dump", "dicts"};
 
         Process p = Runtime.getRuntime().exec(cmd, null);
         BufferedReader bri = new BufferedReader

@@ -1,12 +1,11 @@
 package monto.service.javascript;
 
-import monto.service.MontoService;
-import monto.service.ast.AST;
-import monto.service.ast.ASTs;
-import monto.service.ast.NonTerminal;
-import monto.service.ast.Terminal;
-import monto.service.javascript.antlr.ECMAScriptLexer;
-import monto.service.message.*;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -14,13 +13,21 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.zeromq.ZContext;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
+import monto.service.ast.AST;
+import monto.service.ast.ASTs;
+import monto.service.ast.NonTerminal;
+import monto.service.ast.Terminal;
+import monto.service.javascript.antlr.ECMAScriptLexer;
+import monto.service.message.Language;
+import monto.service.message.LongKey;
+import monto.service.message.Message;
+import monto.service.message.Messages;
+import monto.service.message.Product;
+import monto.service.message.ProductMessage;
+import monto.service.message.VersionMessage;
 
 public class JavaScriptParser extends MontoService {
 
@@ -31,8 +38,8 @@ public class JavaScriptParser extends MontoService {
     private CommonTokenStream tokens = new CommonTokenStream(lexer);
     private monto.service.javascript.antlr.ECMAScriptParser parser = new monto.service.javascript.antlr.ECMAScriptParser(tokens);
 
-    public JavaScriptParser(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Parser", "A parser that produces an AST for JavaScript using ANTLR", AST, JAVASCRIPT, new String[]{"Source"});
+    public JavaScriptParser(ZMQConfiguration zmqConfig) {
+        super(zmqConfig, "javascriptParser", "Parser", "A parser that produces an AST for JavaScript using ANTLR", AST, JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
@@ -58,11 +65,6 @@ public class JavaScriptParser extends MontoService {
                 AST,
                 JAVASCRIPT,
                 ASTs.encode(converter.getRoot()));
-    }
-
-    @Override
-    public void onConfigurationMessage(List<Message> list) throws Exception {
-
     }
 
     private static class Converter implements ParseTreeListener {

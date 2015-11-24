@@ -1,17 +1,24 @@
 package monto.service.javascript;
 
-import monto.service.MontoService;
-import monto.service.javascript.antlr.ECMAScriptLexer;
-import monto.service.message.*;
-import monto.service.token.Category;
-import monto.service.token.Token;
-import monto.service.token.Tokens;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.zeromq.ZContext;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+
+import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
+import monto.service.javascript.antlr.ECMAScriptLexer;
+import monto.service.message.Language;
+import monto.service.message.LongKey;
+import monto.service.message.Message;
+import monto.service.message.Messages;
+import monto.service.message.Product;
+import monto.service.message.ProductMessage;
+import monto.service.message.VersionMessage;
+import monto.service.token.Category;
+import monto.service.token.Token;
+import monto.service.token.Tokens;
 
 public class JavaScriptTokenizer extends MontoService {
 
@@ -20,8 +27,8 @@ public class JavaScriptTokenizer extends MontoService {
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
 
-    public JavaScriptTokenizer(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Tokenizer", "A tokenizer for JavaScript that uses ANTLR for tokenizing", TOKENS, JAVASCRIPT, new String[]{"Source"});
+    public JavaScriptTokenizer(ZMQConfiguration zmqConfig) {
+        super(zmqConfig, "javascriptTokenizer", "Tokenizer", "A tokenizer for JavaScript that uses ANTLR for tokenizing", TOKENS, JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
@@ -186,10 +193,5 @@ public class JavaScriptTokenizer extends MontoService {
         }
 
         return new Token(offset, length, category);
-    }
-
-    @Override
-    public void onConfigurationMessage(List<Message> list) throws Exception {
-
     }
 }

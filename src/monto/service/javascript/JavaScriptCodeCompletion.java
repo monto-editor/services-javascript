@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.zeromq.ZContext;
-
 import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
 import monto.service.ast.AST;
 import monto.service.ast.ASTVisitor;
 import monto.service.ast.ASTs;
@@ -33,8 +32,8 @@ public class JavaScriptCodeCompletion extends MontoService {
     private static final Product COMPLETIONS = new Product("completions");
     private static final Language JAVASCRIPT = new Language("javascript");
 
-    public JavaScriptCodeCompletion(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Code Completion", "A code completion service for JavaScript", COMPLETIONS, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+    public JavaScriptCodeCompletion(ZMQConfiguration zmqConfig) {
+        super(zmqConfig, "javascriptCompletioner", "Code Completion", "A code completion service for JavaScript", COMPLETIONS, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
     private static List<Completion> allCompletions(String contents, AST root) {
@@ -87,11 +86,6 @@ public class JavaScriptCodeCompletion extends MontoService {
                     new ProductDependency(ast));
         }
         throw new IllegalArgumentException("Code completion needs selection");
-    }
-
-    @Override
-    public void onConfigurationMessage(List<Message> list) throws Exception {
-
     }
 
     private static class AllCompletions implements ASTVisitor {

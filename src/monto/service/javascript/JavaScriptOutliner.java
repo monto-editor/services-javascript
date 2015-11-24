@@ -4,9 +4,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-import org.zeromq.ZContext;
-
 import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
 import monto.service.ast.ASTVisitor;
 import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
@@ -31,8 +30,8 @@ public class JavaScriptOutliner extends MontoService {
     private static final Product AST = new Product("ast");
     private static final Language JAVASCRIPT = new Language("javascript");
 
-    public JavaScriptOutliner(ZContext context, String address, String registrationAddress, String serviceID) {
-        super(context, address, registrationAddress, serviceID, "Outline", "An outline service for JavaScript", OUTLINE, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+    public JavaScriptOutliner(ZMQConfiguration zmqConfig) {
+        super(zmqConfig, "javascriptOutliner", "Outline", "An outline service for JavaScript", OUTLINE, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
     @Override
@@ -61,18 +60,12 @@ public class JavaScriptOutliner extends MontoService {
                 new ProductDependency(ast));
     }
 
-    @Override
-    public void onConfigurationMessage(List<Message> list) throws Exception {
-
-    }
-
     /**
      * Traverses the AST and removes unneeded information.
      */
     private static class OutlineTrimmer implements ASTVisitor {
 
         private Deque<Outline> converted = new ArrayDeque<>();
-        private boolean variableDeclaration = false;
 
         public Outline getConverted() {
             return converted.getFirst();
