@@ -1,8 +1,10 @@
 package monto.service.javascript;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class AspellSpellChecker extends MontoService {
 
         List<Token> tokens = Tokens.decode(tokensProduct);
         spellCheck(tokens, version.getContent().toString());
-
+        
         return new ProductMessage(
                 version.getVersionId(),
                 new LongKey(1),
@@ -118,6 +120,7 @@ public class AspellSpellChecker extends MontoService {
             if (token.getCategory().equals(Category.COMMENT) && comments || token.getCategory().equals(Category.STRING) && strings) {
                 String tokenText = text.substring(token.getStartOffset(), token.getEndOffset());
                 String[] words = tokenText.split("\\s+");
+                
                 for (String word : words) {
                     String strippedWord = word.replaceAll("[^a-zA-Z]+", "");
                     int offset = token.getStartOffset();
@@ -125,29 +128,38 @@ public class AspellSpellChecker extends MontoService {
                     if (strippedWord.equals("")) {
                         continue;
                     }
-                    String[] cmd = new String[]{"/bin/sh", "-c", "echo " + strippedWord + " | aspell -a -d " + (token.getCategory().equals(Category.COMMENT) ? commentLanguage : stringLanguage)};
+                    String[] cmd = new String[]{
+                    		"aspell", "-a", "-d", (token.getCategory().equals(Category.COMMENT) ? commentLanguage : stringLanguage)
+                    };
 
                     Process p = Runtime.getRuntime().exec(cmd, null);
-                    BufferedReader bri = new BufferedReader
+                    
+                    BufferedWriter processInput = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+                    processInput.append(strippedWord);
+                    processInput.newLine();
+                    processInput.flush();
+                    processInput.close();
+                    
+                    BufferedReader processOutput = new BufferedReader
                             (new InputStreamReader(p.getInputStream()));
-                    BufferedReader bre = new BufferedReader
+                    BufferedReader processError = new BufferedReader
                             (new InputStreamReader(p.getErrorStream()));
 
-                    handleAspellInput(bri, offset, strippedWord);
-                    handleAspellError(bre);
+                    handleAspellInput(processOutput, offset, strippedWord);
+                    handleAspellError(processError);
 
-                    p.waitFor();
+                    p.destroy();
                 }
             }
         }
     }
 
-    private void handleAspellInput(BufferedReader bri, int offset, String word) throws IOException {
+    private void handleAspellInput(BufferedReader processOutput, int offset, String word) throws IOException {
         String category = "spelling";
 
-        bri.readLine();
+        processOutput.readLine();
         String input;
-        while ((input = bri.readLine()) != null) {
+        while ((input = processOutput.readLine()) != null) {
             if (input.startsWith("&")) {
                 String description = word;
                 if (suggestions && suggestionNumber > 0) {
@@ -161,7 +173,7 @@ public class AspellSpellChecker extends MontoService {
                 errors.add(new Error(offset, word.length(), "warning", category, description));
             }
         }
-        bri.close();
+        processOutput.close();
     }
 
     private void handleAspellError(BufferedReader bre) throws IOException {
