@@ -6,3 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Export-Package: monto.service.javascript,
  monto.service.javascript.antlr
 Require-Bundle: servies-base-java;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
