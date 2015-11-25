@@ -14,26 +14,22 @@ import monto.service.ast.Terminal;
 import monto.service.completion.Completion;
 import monto.service.completion.Completions;
 import monto.service.message.IconType;
-import monto.service.message.Language;
+import monto.service.message.Languages;
 import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ParseException;
-import monto.service.message.Product;
 import monto.service.message.ProductDependency;
 import monto.service.message.ProductMessage;
+import monto.service.message.Products;
 import monto.service.message.Selection;
 import monto.service.message.VersionMessage;
 import monto.service.region.IRegion;
 
 public class JavaScriptCodeCompletion extends MontoService {
 
-    private static final Product AST = new Product("ast");
-    private static final Product COMPLETIONS = new Product("completions");
-    private static final Language JAVASCRIPT = new Language("javascript");
-
     public JavaScriptCodeCompletion(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, "javascriptCompletioner", "Code Completion", "A code completion service for JavaScript", COMPLETIONS, JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+        super(zmqConfig, "javascriptCompletioner", "Code Completion", "A code completion service for JavaScript", Products.COMPLETIONS, Languages.JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
     private static List<Completion> allCompletions(String contents, AST root) {
@@ -45,11 +41,11 @@ public class JavaScriptCodeCompletion extends MontoService {
     @Override
     public ProductMessage onVersionMessage(List<Message> messages) throws ParseException {
         VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(JAVASCRIPT)) {
+        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
-        ProductMessage ast = Messages.getProductMessage(messages, AST, JAVASCRIPT);
-        if (!ast.getLanguage().equals(JAVASCRIPT)) {
+        ProductMessage ast = Messages.getProductMessage(messages, Products.AST, Languages.JAVASCRIPT);
+        if (!ast.getLanguage().equals(Languages.JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in ast product message");
         }
 
@@ -80,8 +76,8 @@ public class JavaScriptCodeCompletion extends MontoService {
                     version.getVersionId(),
                     new LongKey(1),
                     version.getSource(),
-                    COMPLETIONS,
-                    JAVASCRIPT,
+                    Products.COMPLETIONS,
+                    Languages.JAVASCRIPT,
                     Completions.encode(relevant),
                     new ProductDependency(ast));
         }

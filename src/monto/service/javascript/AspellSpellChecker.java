@@ -18,21 +18,18 @@ import monto.service.error.Error;
 import monto.service.error.Errors;
 import monto.service.message.ConfigurationMessage;
 import monto.service.message.Language;
+import monto.service.message.Languages;
 import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
-import monto.service.message.Product;
 import monto.service.message.ProductMessage;
+import monto.service.message.Products;
 import monto.service.message.VersionMessage;
 import monto.service.token.Category;
 import monto.service.token.Token;
 import monto.service.token.Tokens;
 
 public class AspellSpellChecker extends MontoService {
-
-    private static final Product ERRORS = new Product("errors");
-    private static final Product TOKENS = new Product("tokens");
-    private static final Language JAVASCRIPT = new Language("javascript");
 
     private List<Error> errors;
 
@@ -51,7 +48,7 @@ public class AspellSpellChecker extends MontoService {
     private long suggestionNumber = DEFAULT_suggestionNumber;
 
     public AspellSpellChecker(ZMQConfiguration zmqConfig, List<String> languages) {
-        super(zmqConfig, "aspellSpellChecker", "Spell checker", "Can check spelling errors using aspell", JAVASCRIPT, ERRORS, new Option[]{
+        super(zmqConfig, "aspellSpellChecker", "Spell checker", "Can check spelling errors using aspell", Languages.JAVASCRIPT, Products.ERRORS, new Option[]{
                 new BooleanOption("comments", "Check comments", true),
                 new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
                 new BooleanOption("strings", "Check strings", true),
@@ -66,12 +63,12 @@ public class AspellSpellChecker extends MontoService {
     public ProductMessage onVersionMessage(List<Message> messages) throws Exception {
         errors = new ArrayList<>();
         VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(JAVASCRIPT)) {
+        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
 
-        ProductMessage tokensProduct = Messages.getProductMessage(messages, TOKENS, new Language("javascript"));
-        if (!tokensProduct.getLanguage().equals(JAVASCRIPT)) {
+        ProductMessage tokensProduct = Messages.getProductMessage(messages, Products.TOKENS, new Language("javascript"));
+        if (!tokensProduct.getLanguage().equals(Languages.JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in token product");
         }
 
@@ -82,8 +79,8 @@ public class AspellSpellChecker extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                ERRORS,
-                JAVASCRIPT,
+                Products.ERRORS,
+                Languages.JAVASCRIPT,
                 Errors.encode(errors.stream()));
     }
 

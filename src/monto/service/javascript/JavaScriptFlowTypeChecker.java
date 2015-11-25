@@ -15,18 +15,15 @@ import monto.service.ZMQConfiguration;
 import monto.service.configuration.Option;
 import monto.service.error.Error;
 import monto.service.error.Errors;
-import monto.service.message.Language;
+import monto.service.message.Languages;
 import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
-import monto.service.message.Product;
 import monto.service.message.ProductMessage;
+import monto.service.message.Products;
 import monto.service.message.VersionMessage;
 
 public class JavaScriptFlowTypeChecker extends MontoService {
-
-    private static final Product ERRORS = new Product("errors");
-    private static final Language JAVASCRIPT = new Language("javascript");
 
     private String fileName;
     private File dir;
@@ -36,7 +33,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
 
 
     public JavaScriptFlowTypeChecker(ZMQConfiguration zmqConfig, String flowLocation) {
-        super(zmqConfig, "javascriptFlowTypeChecker", "Error Checker", "Can check type errors using FlowType", JAVASCRIPT, ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
+        super(zmqConfig, "javascriptFlowTypeChecker", "Error Checker", "Can check type errors using FlowType", Languages.JAVASCRIPT, Products.ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
         fileName = flowLocation + "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();
@@ -55,7 +52,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
     public ProductMessage onVersionMessage(List<Message> messages) throws Exception {
         errors = new ArrayList<>();
         VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(JAVASCRIPT)) {
+        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
 
@@ -66,8 +63,8 @@ public class JavaScriptFlowTypeChecker extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                ERRORS,
-                JAVASCRIPT,
+                Products.ERRORS,
+                Languages.JAVASCRIPT,
                 Errors.encode(errors.stream()));
     }
 

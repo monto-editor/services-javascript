@@ -21,31 +21,28 @@ import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.javascript.antlr.ECMAScriptLexer;
-import monto.service.message.Language;
+import monto.service.message.Languages;
 import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
-import monto.service.message.Product;
 import monto.service.message.ProductMessage;
+import monto.service.message.Products;
 import monto.service.message.VersionMessage;
 
 public class JavaScriptParser extends MontoService {
-
-    private static final Product AST = new Product("ast");
-    private static final Language JAVASCRIPT = new Language("javascript");
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
     private CommonTokenStream tokens = new CommonTokenStream(lexer);
     private monto.service.javascript.antlr.ECMAScriptParser parser = new monto.service.javascript.antlr.ECMAScriptParser(tokens);
 
     public JavaScriptParser(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, "javascriptParser", "Parser", "A parser that produces an AST for JavaScript using ANTLR", AST, JAVASCRIPT, new String[]{"Source"});
+        super(zmqConfig, "javascriptParser", "Parser", "A parser that produces an AST for JavaScript using ANTLR", Products.AST, Languages.JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
     public ProductMessage onVersionMessage(List<Message> messages) throws IOException {
         VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(JAVASCRIPT)) {
+        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
             throw new IllegalArgumentException("wrong language in version message");
         }
         lexer.setInputStream(new ANTLRInputStream(version.getContent()));
@@ -62,8 +59,8 @@ public class JavaScriptParser extends MontoService {
                 version.getVersionId(),
                 new LongKey(1),
                 version.getSource(),
-                AST,
-                JAVASCRIPT,
+                Products.AST,
+                Languages.JAVASCRIPT,
                 ASTs.encode(converter.getRoot()));
     }
 
