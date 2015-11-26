@@ -10,11 +10,11 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.message.Languages;
-import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
+import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
 import monto.service.token.Category;
 import monto.service.token.Token;
@@ -25,7 +25,7 @@ public class JavaScriptTokenizer extends MontoService {
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
 
     public JavaScriptTokenizer(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, "javascriptTokenizer", "Tokenizer", "A tokenizer for JavaScript that uses ANTLR for tokenizing", Products.TOKENS, Languages.JAVASCRIPT, new String[]{"Source"});
+        super(zmqConfig, new ServiceID("javascriptTokenizer"), "Tokenizer", "A tokenizer for JavaScript that uses ANTLR for tokenizing", Products.TOKENS, Languages.JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
@@ -37,12 +37,9 @@ public class JavaScriptTokenizer extends MontoService {
         lexer.setInputStream(new ANTLRInputStream(version.getContent()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
 
-        return new ProductMessage(
+        return productMessage(
                 version.getVersionId(),
-                new LongKey(1),
                 version.getSource(),
-                Products.TOKENS,
-                Languages.JAVASCRIPT,
                 Tokens.encode(tokens)
         );
     }

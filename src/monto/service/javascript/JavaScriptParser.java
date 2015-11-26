@@ -22,11 +22,11 @@ import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.message.Languages;
-import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
+import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
 
 public class JavaScriptParser extends MontoService {
@@ -36,7 +36,7 @@ public class JavaScriptParser extends MontoService {
     private monto.service.javascript.antlr.ECMAScriptParser parser = new monto.service.javascript.antlr.ECMAScriptParser(tokens);
 
     public JavaScriptParser(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, "javascriptParser", "Parser", "A parser that produces an AST for JavaScript using ANTLR", Products.AST, Languages.JAVASCRIPT, new String[]{"Source"});
+        super(zmqConfig, new ServiceID("javascriptParser"), "Parser", "A parser that produces an AST for JavaScript using ANTLR", Products.AST, Languages.JAVASCRIPT, new String[]{"Source"});
     }
 
     @Override
@@ -55,12 +55,9 @@ public class JavaScriptParser extends MontoService {
         Converter converter = new Converter();
         walker.walk(converter, root);
 
-        return new ProductMessage(
+        return productMessage(
                 version.getVersionId(),
-                new LongKey(1),
                 version.getSource(),
-                Products.AST,
-                Languages.JAVASCRIPT,
                 ASTs.encode(converter.getRoot()));
     }
 

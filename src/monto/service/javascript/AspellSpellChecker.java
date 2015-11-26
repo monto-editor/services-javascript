@@ -21,11 +21,11 @@ import monto.service.error.Errors;
 import monto.service.message.ConfigurationMessage;
 import monto.service.message.Language;
 import monto.service.message.Languages;
-import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
+import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
 import monto.service.token.Category;
 import monto.service.token.Token;
@@ -50,7 +50,7 @@ public class AspellSpellChecker extends MontoService {
     private long suggestionNumber = DEFAULT_suggestionNumber;
 
     public AspellSpellChecker(ZMQConfiguration zmqConfig, List<String> languages) {
-        super(zmqConfig, "aspellSpellChecker", "Spell checker", "Can check spelling errors using aspell", Languages.JAVASCRIPT, Products.ERRORS, new Option[]{
+        super(zmqConfig, new ServiceID("aspellSpellChecker"), "Spell checker", "Can check spelling errors using aspell", Languages.JAVASCRIPT, Products.ERRORS, new Option[]{
                 new BooleanOption("comments", "Check comments", true),
                 new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
                 new BooleanOption("strings", "Check strings", true),
@@ -77,12 +77,9 @@ public class AspellSpellChecker extends MontoService {
         List<Token> tokens = Tokens.decode(tokensProduct);
         spellCheck(tokens, version.getContent().toString());
         
-        return new ProductMessage(
+        return productMessage(
                 version.getVersionId(),
-                new LongKey(1),
                 version.getSource(),
-                Products.ERRORS,
-                Languages.JAVASCRIPT,
                 Errors.encode(errors.stream()));
     }
 

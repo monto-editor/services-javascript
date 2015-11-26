@@ -15,7 +15,6 @@ import monto.service.completion.Completion;
 import monto.service.completion.Completions;
 import monto.service.message.IconType;
 import monto.service.message.Languages;
-import monto.service.message.LongKey;
 import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ParseException;
@@ -23,13 +22,14 @@ import monto.service.message.ProductDependency;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
 import monto.service.message.Selection;
+import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
 import monto.service.region.IRegion;
 
 public class JavaScriptCodeCompletion extends MontoService {
 
     public JavaScriptCodeCompletion(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, "javascriptCompletioner", "Code Completion", "A code completion service for JavaScript", Products.COMPLETIONS, Languages.JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+        super(zmqConfig, new ServiceID("javascriptCompletioner"), "Code Completion", "A code completion service for JavaScript", Products.COMPLETIONS, Languages.JAVASCRIPT, new String[]{"Source", "ast/javascript"});
     }
 
     private static List<Completion> allCompletions(String contents, AST root) {
@@ -72,12 +72,9 @@ public class JavaScriptCodeCompletion extends MontoService {
                                     version.getSelections().get(0).getStartOffset(),
                                     comp.getIcon()));
 
-            return new ProductMessage(
+            return productMessage(
                     version.getVersionId(),
-                    new LongKey(1),
                     version.getSource(),
-                    Products.COMPLETIONS,
-                    Languages.JAVASCRIPT,
                     Completions.encode(relevant),
                     new ProductDependency(ast));
         }
