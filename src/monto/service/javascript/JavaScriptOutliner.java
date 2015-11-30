@@ -18,16 +18,26 @@ import monto.service.message.ParseException;
 import monto.service.message.ProductDependency;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
-import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
 import monto.service.outline.Outline;
 import monto.service.outline.Outlines;
 import monto.service.region.Region;
+import monto.service.registration.ServiceDependency;
+import monto.service.registration.SourceDependency;
 
 public class JavaScriptOutliner extends MontoService {
 
     public JavaScriptOutliner(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, new ServiceID("javascriptOutliner"), "Outline", "An outline service for JavaScript", Products.OUTLINE, Languages.JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+        super(zmqConfig,
+        		JavaScriptServices.JAVASCRIPT_OUTLINER,
+        		"Outline",
+        		"An outline service for JavaScript",
+        		Products.OUTLINE,
+        		Languages.JAVASCRIPT,
+        		dependencies(
+        				new SourceDependency(Languages.JAVASCRIPT),
+        				new ServiceDependency(JavaScriptServices.JAVASCRIPT_PARSER)
+        		));
     }
 
     @Override

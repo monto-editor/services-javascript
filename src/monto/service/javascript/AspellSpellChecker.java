@@ -13,7 +13,6 @@ import monto.service.ZMQConfiguration;
 import monto.service.configuration.BooleanOption;
 import monto.service.configuration.Configuration;
 import monto.service.configuration.NumberOption;
-import monto.service.configuration.Option;
 import monto.service.configuration.OptionGroup;
 import monto.service.configuration.XorOption;
 import monto.service.error.Error;
@@ -25,8 +24,9 @@ import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
-import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
+import monto.service.registration.ServiceDependency;
+import monto.service.registration.SourceDependency;
 import monto.service.token.Category;
 import monto.service.token.Token;
 import monto.service.token.Tokens;
@@ -50,14 +50,24 @@ public class AspellSpellChecker extends MontoService {
     private long suggestionNumber = DEFAULT_suggestionNumber;
 
     public AspellSpellChecker(ZMQConfiguration zmqConfig, List<String> languages) {
-        super(zmqConfig, new ServiceID("aspellSpellChecker"), "Spell checker", "Can check spelling errors using aspell", Languages.JAVASCRIPT, Products.ERRORS, new Option[]{
-                new BooleanOption("comments", "Check comments", true),
-                new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
-                new BooleanOption("strings", "Check strings", true),
-                new OptionGroup("strings", new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)),
-                new BooleanOption("suggestions", "Show suggestions", false),
-                new OptionGroup("suggestions", new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10))
-        }, new String[]{"Source", "tokens/javascript"});
+        super(zmqConfig,
+        		JavaScriptServices.ASPELL_SPELLCHECKER,
+        		"Spell checker",
+        		"Can check spelling errors using aspell",
+        		Languages.JAVASCRIPT,
+        		Products.ERRORS,
+        		options(
+        				new BooleanOption("comments", "Check comments", true),
+        				new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
+        				new BooleanOption("strings", "Check strings", true),
+        				new OptionGroup("strings", new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)),
+        				new BooleanOption("suggestions", "Show suggestions", false),
+        				new OptionGroup("suggestions", new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10))
+        		),
+        		dependencies(
+        				new SourceDependency(Languages.JAVASCRIPT),
+        				new ServiceDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER)
+        		));
         errors = new ArrayList<>();
     }
 

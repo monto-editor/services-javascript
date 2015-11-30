@@ -12,7 +12,6 @@ import java.util.List;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
-import monto.service.configuration.Option;
 import monto.service.error.Error;
 import monto.service.error.Errors;
 import monto.service.message.Languages;
@@ -20,8 +19,9 @@ import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
-import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
+import monto.service.registration.ServiceDependency;
+import monto.service.registration.SourceDependency;
 
 public class JavaScriptFlowTypeChecker extends MontoService {
 
@@ -33,7 +33,17 @@ public class JavaScriptFlowTypeChecker extends MontoService {
 
 
     public JavaScriptFlowTypeChecker(ZMQConfiguration zmqConfig, String flowLocation) {
-        super(zmqConfig, new ServiceID("javascriptFlowTypeChecker"), "Error Checker", "Can check type errors using FlowType", Languages.JAVASCRIPT, Products.ERRORS, new Option[]{}, new String[]{"Source", "tokens/javascript"});
+        super(zmqConfig,
+        		JavaScriptServices.JAVASCRIPT_TYPECHECKER,
+        		"Error Checker",
+        		"Can check type errors using FlowType",
+        		Products.ERRORS,
+        		Languages.JAVASCRIPT,
+        		dependencies(
+        				new SourceDependency(Languages.JAVASCRIPT),
+        				new ServiceDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER)
+        		));
+
         fileName = flowLocation + "flowTypeCheckerFile.js";
         dir = new File("./");
         errors = new ArrayList<>();

@@ -22,14 +22,24 @@ import monto.service.message.ProductDependency;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
 import monto.service.message.Selection;
-import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
 import monto.service.region.IRegion;
+import monto.service.registration.ServiceDependency;
+import monto.service.registration.SourceDependency;
 
 public class JavaScriptCodeCompletion extends MontoService {
 
     public JavaScriptCodeCompletion(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, new ServiceID("javascriptCompletioner"), "Code Completion", "A code completion service for JavaScript", Products.COMPLETIONS, Languages.JAVASCRIPT, new String[]{"Source", "ast/javascript"});
+        super(zmqConfig,
+        		JavaScriptServices.JAVASCRIPT_CODE_COMPLETION,
+        		"Code Completion",
+        		"A code completion service for JavaScript",
+        		Products.COMPLETIONS,
+        		Languages.JAVASCRIPT,
+        		dependencies(
+        				new SourceDependency(Languages.JAVASCRIPT),
+        				new ServiceDependency(JavaScriptServices.JAVASCRIPT_PARSER)
+        		));
     }
 
     private static List<Completion> allCompletions(String contents, AST root) {

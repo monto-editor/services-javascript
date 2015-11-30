@@ -26,8 +26,8 @@ import monto.service.message.Message;
 import monto.service.message.Messages;
 import monto.service.message.ProductMessage;
 import monto.service.message.Products;
-import monto.service.message.ServiceID;
 import monto.service.message.VersionMessage;
+import monto.service.registration.SourceDependency;
 
 public class JavaScriptParser extends MontoService {
 
@@ -36,7 +36,15 @@ public class JavaScriptParser extends MontoService {
     private monto.service.javascript.antlr.ECMAScriptParser parser = new monto.service.javascript.antlr.ECMAScriptParser(tokens);
 
     public JavaScriptParser(ZMQConfiguration zmqConfig) {
-        super(zmqConfig, new ServiceID("javascriptParser"), "Parser", "A parser that produces an AST for JavaScript using ANTLR", Products.AST, Languages.JAVASCRIPT, new String[]{"Source"});
+        super(zmqConfig,
+        		JavaScriptServices.JAVASCRIPT_PARSER,
+        		"Parser",
+        		"A parser that produces an AST for JavaScript using ANTLR",
+        		Products.AST,
+        		Languages.JAVASCRIPT,
+        		dependencies(
+        				new SourceDependency(Languages.JAVASCRIPT)
+        		));
     }
 
     @Override

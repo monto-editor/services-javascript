@@ -14,9 +14,17 @@ import org.zeromq.ZContext;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
+import monto.service.message.ServiceID;
 
 public class JavaScriptServices {
 	
+	public static final ServiceID JAVASCRIPT_TOKENIZER = new ServiceID("javascriptTokenizer");
+	public static final ServiceID JAVASCRIPT_PARSER = new ServiceID("javascriptParser");
+	public static final ServiceID JAVASCRIPT_OUTLINER = new ServiceID("javascriptOutliner");
+	public static final ServiceID JAVASCRIPT_TYPECHECKER = new ServiceID("javascriptTypechecker");
+	public static final ServiceID JAVASCRIPT_CODE_COMPLETION = new ServiceID("javascriptCodeCompletion");
+	public static final ServiceID ASPELL_SPELLCHECKER = new ServiceID("aspellSpellChecker");
+
 	public static void main(String[] args) throws ParseException {
         String flowLocation = "";
         ZContext context = new ZContext(1);
