@@ -34,8 +34,9 @@ public class JavaScriptCodeCompletion extends MontoService {
         		JavaScriptServices.JAVASCRIPT_CODE_COMPLETION,
         		"Code Completion",
         		"A code completion service for JavaScript",
-        		Products.COMPLETIONS,
         		Languages.JAVASCRIPT,
+        		Products.COMPLETIONS,
+        		options(),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT),
         				new ServiceDependency(JavaScriptServices.JAVASCRIPT_PARSER)
@@ -85,6 +86,7 @@ public class JavaScriptCodeCompletion extends MontoService {
             return productMessage(
                     version.getVersionId(),
                     version.getSource(),
+                    Products.COMPLETIONS,
                     Completions.encode(relevant),
                     new ProductDependency(ast));
         }

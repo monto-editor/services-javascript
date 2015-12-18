@@ -37,8 +37,9 @@ public class JavaScriptFlowTypeChecker extends MontoService {
         		JavaScriptServices.JAVASCRIPT_TYPECHECKER,
         		"Error Checker",
         		"Can check type errors using FlowType",
-        		Products.ERRORS,
         		Languages.JAVASCRIPT,
+        		Products.ERRORS,
+        		options(),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT),
         				new ServiceDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER)
@@ -72,6 +73,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
         return productMessage(
                 version.getVersionId(),
                 version.getSource(),
+                Products.ERRORS,
                 Errors.encode(errors.stream()));
     }
 

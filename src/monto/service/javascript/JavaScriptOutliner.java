@@ -32,8 +32,9 @@ public class JavaScriptOutliner extends MontoService {
         		JavaScriptServices.JAVASCRIPT_OUTLINER,
         		"Outline",
         		"An outline service for JavaScript",
-        		Products.OUTLINE,
         		Languages.JAVASCRIPT,
+        		Products.OUTLINE,
+        		options(),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT),
         				new ServiceDependency(JavaScriptServices.JAVASCRIPT_PARSER)
@@ -59,6 +60,7 @@ public class JavaScriptOutliner extends MontoService {
         return productMessage(
                 version.getVersionId(),
                 version.getSource(),
+                Products.OUTLINE,
                 Outlines.encode(trimmer.getConverted()),
                 new ProductDependency(ast));
     }

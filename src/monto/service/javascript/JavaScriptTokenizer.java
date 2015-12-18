@@ -29,8 +29,9 @@ public class JavaScriptTokenizer extends MontoService {
         		JavaScriptServices.JAVASCRIPT_TOKENIZER,
         		"Tokenizer",
         		"A tokenizer for JavaScript that uses ANTLR for tokenizing",
-        		Products.TOKENS,
         		Languages.JAVASCRIPT,
+        		Products.TOKENS,
+        		options(),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT)
         		));
@@ -48,6 +49,7 @@ public class JavaScriptTokenizer extends MontoService {
         return productMessage(
                 version.getVersionId(),
                 version.getSource(),
+                Products.TOKENS,
                 Tokens.encode(tokens)
         );
     }

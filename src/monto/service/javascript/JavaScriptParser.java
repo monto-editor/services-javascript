@@ -40,8 +40,9 @@ public class JavaScriptParser extends MontoService {
         		JavaScriptServices.JAVASCRIPT_PARSER,
         		"Parser",
         		"A parser that produces an AST for JavaScript using ANTLR",
-        		Products.AST,
         		Languages.JAVASCRIPT,
+        		Products.AST,
+        		options(),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT)
         		));
@@ -66,6 +67,7 @@ public class JavaScriptParser extends MontoService {
         return productMessage(
                 version.getVersionId(),
                 version.getSource(),
+                Products.AST,
                 ASTs.encode(converter.getRoot()));
     }
 

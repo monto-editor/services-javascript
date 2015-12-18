@@ -90,6 +90,7 @@ public class AspellSpellChecker extends MontoService {
         return productMessage(
                 version.getVersionId(),
                 version.getSource(),
+                Products.ERRORS,
                 Errors.encode(errors.stream()));
     }
 
