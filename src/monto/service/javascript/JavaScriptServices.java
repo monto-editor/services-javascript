@@ -14,7 +14,7 @@ import org.zeromq.ZContext;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
-import monto.service.message.ServiceID;
+import monto.service.types.ServiceID;
 
 public class JavaScriptServices {
 	

@@ -12,24 +12,24 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.configuration.BooleanOption;
 import monto.service.configuration.Configuration;
+import monto.service.configuration.ConfigurationMessage;
 import monto.service.configuration.NumberOption;
 import monto.service.configuration.OptionGroup;
 import monto.service.configuration.XorOption;
 import monto.service.error.Error;
 import monto.service.error.Errors;
-import monto.service.message.ConfigurationMessage;
-import monto.service.message.Language;
-import monto.service.message.Languages;
-import monto.service.message.Message;
-import monto.service.message.Messages;
-import monto.service.message.ProductMessage;
-import monto.service.message.Products;
-import monto.service.message.VersionMessage;
+import monto.service.product.ProductMessage;
+import monto.service.product.Products;
 import monto.service.registration.ServiceDependency;
 import monto.service.registration.SourceDependency;
 import monto.service.token.Category;
 import monto.service.token.Token;
 import monto.service.token.Tokens;
+import monto.service.types.Language;
+import monto.service.types.Languages;
+import monto.service.types.Message;
+import monto.service.types.Messages;
+import monto.service.version.VersionMessage;
 
 public class AspellSpellChecker extends MontoService {
 

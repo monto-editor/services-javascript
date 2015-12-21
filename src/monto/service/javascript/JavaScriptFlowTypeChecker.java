@@ -14,14 +14,14 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.error.Error;
 import monto.service.error.Errors;
-import monto.service.message.Languages;
-import monto.service.message.Message;
-import monto.service.message.Messages;
-import monto.service.message.ProductMessage;
-import monto.service.message.Products;
-import monto.service.message.VersionMessage;
+import monto.service.product.ProductMessage;
+import monto.service.product.Products;
 import monto.service.registration.ServiceDependency;
 import monto.service.registration.SourceDependency;
+import monto.service.types.Languages;
+import monto.service.types.Message;
+import monto.service.types.Messages;
+import monto.service.version.VersionMessage;
 
 public class JavaScriptFlowTypeChecker extends MontoService {
 

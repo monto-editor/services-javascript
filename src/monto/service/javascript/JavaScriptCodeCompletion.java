@@ -13,19 +13,19 @@ import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.completion.Completion;
 import monto.service.completion.Completions;
-import monto.service.message.IconType;
-import monto.service.message.Languages;
-import monto.service.message.Message;
-import monto.service.message.Messages;
-import monto.service.message.ParseException;
-import monto.service.message.ProductDependency;
-import monto.service.message.ProductMessage;
-import monto.service.message.Products;
-import monto.service.message.Selection;
-import monto.service.message.VersionMessage;
+import monto.service.filedependencies.ProductDependency;
+import monto.service.product.ProductMessage;
+import monto.service.product.Products;
 import monto.service.region.IRegion;
 import monto.service.registration.ServiceDependency;
 import monto.service.registration.SourceDependency;
+import monto.service.types.IconType;
+import monto.service.types.Languages;
+import monto.service.types.Message;
+import monto.service.types.Messages;
+import monto.service.types.ParseException;
+import monto.service.types.Selection;
+import monto.service.version.VersionMessage;
 
 public class JavaScriptCodeCompletion extends MontoService {
 
