@@ -1,6 +1,7 @@
 package monto.service.javascript;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +95,10 @@ public class JavaScriptServices {
             service.start();
         }
     }
+
+	public static URL getResource(String name) {
+		return JavaScriptServices.class.getResource("/"+name);
+	}
 
 	private static Option required(String opt, boolean hasArg, String description) {
 		Option option = new Option(opt,hasArg,description);

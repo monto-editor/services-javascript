@@ -1,5 +1,6 @@
 package monto.service.javascript;
 
+import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -18,7 +19,6 @@ import monto.service.product.Products;
 import monto.service.region.Region;
 import monto.service.registration.ServiceDependency;
 import monto.service.registration.SourceDependency;
-import monto.service.types.IconType;
 import monto.service.types.Languages;
 import monto.service.types.Message;
 import monto.service.types.Messages;
@@ -87,23 +87,19 @@ public class JavaScriptOutliner extends MontoService {
                     break;
 
                 case "Class":
-                    addVarToConverted(node, "class", IconType.NO_IMG);
-                    break;
-
-                case "Enum":
-                    addVarToConverted(node, "enum", IconType.NO_IMG);
+                    addVarToConverted(node, "class", JavaScriptServices.getResource("class.png"));
                     break;
 
                 case "Const":
-                    addVarToConverted(node, "const", IconType.NO_IMG);
+                    addVarToConverted(node, "const", JavaScriptServices.getResource("const.png"));
                     break;
 
                 case "variableDeclaration":
-                    addVarToConverted(node, "var", IconType.NO_IMG);
+                    addVarToConverted(node, "var", JavaScriptServices.getResource("variable.png"));
                     break;
 
                 case "functionDeclaration":
-                    addFuncToConverted(node, "function", IconType.NO_IMG);
+                    addFuncToConverted(node, "function", JavaScriptServices.getResource("public.png"));
                     break;
 
                 default:
@@ -111,7 +107,7 @@ public class JavaScriptOutliner extends MontoService {
             }
         }
 
-        private void addVarToConverted(NonTerminal node, String name, String icon) {
+        private void addVarToConverted(NonTerminal node, String name, URL icon) {
             node.getChildren()
                     .stream()
                     .filter(ast -> ast instanceof Terminal)
@@ -125,7 +121,7 @@ public class JavaScriptOutliner extends MontoService {
                     });
         }
 
-        private void addFuncToConverted(NonTerminal node, String name, String icon) {
+        private void addFuncToConverted(NonTerminal node, String name, URL icon) {
             Object[] terminalChildren = node.getChildren()
                     .stream()
                     .filter(ast -> ast instanceof Terminal)
