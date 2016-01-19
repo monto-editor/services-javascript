@@ -68,7 +68,7 @@ public class JavaScriptOutliner extends MontoService {
     /**
      * Traverses the AST and removes unneeded information.
      */
-    private static class OutlineTrimmer implements ASTVisitor {
+    private class OutlineTrimmer implements ASTVisitor {
 
         private Deque<Outline> converted = new ArrayDeque<>();
 
@@ -87,19 +87,19 @@ public class JavaScriptOutliner extends MontoService {
                     break;
 
                 case "Class":
-                    addVarToConverted(node, "class", JavaScriptServices.getResource("class.png"));
+                    addVarToConverted(node, "class", getResource("class.png"));
                     break;
 
                 case "Const":
-                    addVarToConverted(node, "const", JavaScriptServices.getResource("const.png"));
+                    addVarToConverted(node, "const", getResource("const.png"));
                     break;
 
                 case "variableDeclaration":
-                    addVarToConverted(node, "var", JavaScriptServices.getResource("variable.png"));
+                    addVarToConverted(node, "var", getResource("variable.png"));
                     break;
 
                 case "functionDeclaration":
-                    addFuncToConverted(node, "function", JavaScriptServices.getResource("public.png"));
+                    addFuncToConverted(node, "function", getResource("public.png"));
                     break;
 
                 default:

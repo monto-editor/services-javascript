@@ -1,7 +1,6 @@
 package monto.service.javascript;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +9,11 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.zeromq.ZContext;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
+import monto.service.resources.ResourceServer;
 import monto.service.types.ServiceID;
 
 public class JavaScriptServices {
@@ -25,8 +24,9 @@ public class JavaScriptServices {
 	public static final ServiceID JAVASCRIPT_TYPECHECKER = new ServiceID("javascriptTypechecker");
 	public static final ServiceID JAVASCRIPT_CODE_COMPLETION = new ServiceID("javascriptCodeCompletion");
 	public static final ServiceID ASPELL_SPELLCHECKER = new ServiceID("aspellSpellChecker");
+	private static ResourceServer resourceServer;
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws Exception {
         String flowLocation = "";
         ZContext context = new ZContext(1);
         List<MontoService> services = new ArrayList<>();
@@ -35,8 +35,13 @@ public class JavaScriptServices {
             @Override
             public void run() {
                 System.out.println("terminating...");
-                for (MontoService service : services)
-                    service.stop();
+				try {
+					for (MontoService service : services)
+						service.stop(); 
+					resourceServer.stop();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
                 context.destroy();
 
                 System.out.println("everything terminated, good bye");
@@ -53,6 +58,7 @@ public class JavaScriptServices {
                 .addOption(required("address", true, "address of services"))
                 .addOption(required("registration", true, "address of broker registration"))
                 .addOption(required("configuration", true, "address of configuration messages"))
+                .addOption(required("resources", true, "port for resource http server"))
                 .addOption("flowlocation", true, "directory in which the flow binaries are located");
 
         CommandLineParser parser = new DefaultParser();
@@ -62,8 +68,12 @@ public class JavaScriptServices {
         		context,
         		cmd.getOptionValue("address"),
         		cmd.getOptionValue("registration"),
-        		cmd.getOptionValue("configuration"));
+        		cmd.getOptionValue("configuration"),
+        		Integer.parseInt(cmd.getOptionValue("resources")));
 
+        resourceServer = new ResourceServer(JavaScriptServices.class.getResource("/images").getPath(), zmqConfig.getResourcePort());
+        resourceServer.start();
+        
         if (cmd.hasOption("flowlocation")) {
             flowLocation = cmd.getOptionValue("flowlocation");
         }
@@ -95,10 +105,6 @@ public class JavaScriptServices {
             service.start();
         }
     }
-
-	public static URL getResource(String name) {
-		return JavaScriptServices.class.getResource("/"+name);
-	}
 
 	private static Option required(String opt, boolean hasArg, String description) {
 		Option option = new Option(opt,hasArg,description);
