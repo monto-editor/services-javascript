@@ -1,5 +1,6 @@
 package monto.service.javascript;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,7 +20,6 @@ import monto.service.product.Products;
 import monto.service.region.IRegion;
 import monto.service.registration.ServiceDependency;
 import monto.service.registration.SourceDependency;
-import monto.service.types.IconType;
 import monto.service.types.Languages;
 import monto.service.types.Message;
 import monto.service.types.Messages;
@@ -43,7 +43,7 @@ public class JavaScriptCodeCompletion extends MontoService {
         		));
     }
 
-    private static List<Completion> allCompletions(String contents, AST root) {
+    private List<Completion> allCompletions(String contents, AST root) {
         AllCompletions completionVisitor = new AllCompletions(contents);
         root.accept(completionVisitor);
         return completionVisitor.getCompletions();
@@ -93,7 +93,7 @@ public class JavaScriptCodeCompletion extends MontoService {
         throw new IllegalArgumentException("Code completion needs selection");
     }
 
-    private static class AllCompletions implements ASTVisitor {
+    private class AllCompletions implements ASTVisitor {
 
         private List<Completion> completions = new ArrayList<>();
         private String content;
@@ -106,30 +106,26 @@ public class JavaScriptCodeCompletion extends MontoService {
         public void visit(NonTerminal node) {
             switch (node.getName()) {
                 case "Class":
-                    structureDeclaration(node, "class", IconType.NO_IMG);
-                    break;
-
-                case "Enum":
-                    structureDeclaration(node, "enum", IconType.NO_IMG);
+                    structureDeclaration(node, "class", getResource("class.png"));
                     break;
 
                 case "Const":
-                    structureDeclaration(node, "const", IconType.NO_IMG);
+                    structureDeclaration(node, "const", getResource("const.png"));
                     break;
 
                 case "variableDeclaration":
-                    structureDeclaration(node, "var", IconType.NO_IMG);
+                    structureDeclaration(node, "var", getResource("variable.png"));
                     break;
 
                 case "functionDeclaration":
-                    addFuncToConverted(node, "function", IconType.NO_IMG);
+                    addFuncToConverted(node, "function", getResource("public.png"));
 
                 default:
                     node.getChildren().forEach(child -> child.accept(this));
             }
         }
 
-        private void addFuncToConverted(NonTerminal node, String name, String icon) {
+        private void addFuncToConverted(NonTerminal node, String name, URL icon) {
             Object[] terminalChildren = node.getChildren()
                     .stream()
                     .filter(ast -> ast instanceof Terminal)
@@ -147,7 +143,7 @@ public class JavaScriptCodeCompletion extends MontoService {
 
         }
 
-        private void structureDeclaration(NonTerminal node, String name, String icon) {
+        private void structureDeclaration(NonTerminal node, String name, URL icon) {
             Terminal structureIdent = (Terminal) node
                     .getChildren()
                     .stream()
