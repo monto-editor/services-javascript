@@ -24,10 +24,9 @@ import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.SourceDependency;
+import monto.service.request.Request;
+import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
-import monto.service.types.Message;
-import monto.service.types.Messages;
-import monto.service.version.VersionMessage;
 
 public class JavaScriptParser extends MontoService {
 
@@ -49,11 +48,9 @@ public class JavaScriptParser extends MontoService {
     }
 
     @Override
-    public ProductMessage onVersionMessage(List<Message> messages) throws IOException {
-        VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
-            throw new IllegalArgumentException("wrong language in version message");
-        }
+    public ProductMessage onRequest(Request request) throws IOException {
+    	SourceMessage version = request.getSourceMessage()
+    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         lexer.setInputStream(new ANTLRInputStream(version.getContent()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
@@ -65,7 +62,7 @@ public class JavaScriptParser extends MontoService {
         walker.walk(converter, root);
 
         return productMessage(
-                version.getVersionId(),
+                version.getId(),
                 version.getSource(),
                 Products.AST,
                 ASTs.encode(converter.getRoot()));

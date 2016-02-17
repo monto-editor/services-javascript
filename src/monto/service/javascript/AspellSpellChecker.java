@@ -20,16 +20,14 @@ import monto.service.error.Error;
 import monto.service.error.Errors;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
-import monto.service.registration.ServiceDependency;
+import monto.service.registration.ProductDependency;
 import monto.service.registration.SourceDependency;
+import monto.service.request.Request;
+import monto.service.source.SourceMessage;
 import monto.service.token.Category;
 import monto.service.token.Token;
 import monto.service.token.Tokens;
-import monto.service.types.Language;
 import monto.service.types.Languages;
-import monto.service.types.Message;
-import monto.service.types.Messages;
-import monto.service.version.VersionMessage;
 
 public class AspellSpellChecker extends MontoService {
 
@@ -66,29 +64,24 @@ public class AspellSpellChecker extends MontoService {
         		),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT),
-        				new ServiceDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER)
+        				new ProductDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)
         		));
         errors = new ArrayList<>();
     }
 
     @Override
-    public ProductMessage onVersionMessage(List<Message> messages) throws Exception {
+    public ProductMessage onRequest(Request request) throws Exception {
+    	SourceMessage version = request.getSourceMessage()
+    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        ProductMessage tokensProduct = request.getProductMessage(Products.TOKENS, Languages.JAVASCRIPT)
+        		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
+
         errors = new ArrayList<>();
-        VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
-            throw new IllegalArgumentException("wrong language in version message");
-        }
-
-        ProductMessage tokensProduct = Messages.getProductMessage(messages, Products.TOKENS, new Language("javascript"));
-        if (!tokensProduct.getLanguage().equals(Languages.JAVASCRIPT)) {
-            throw new IllegalArgumentException("wrong language in token product");
-        }
-
         List<Token> tokens = Tokens.decode(tokensProduct);
         spellCheck(tokens, version.getContent().toString());
         
         return productMessage(
-                version.getVersionId(),
+                version.getId(),
                 version.getSource(),
                 Products.ERRORS,
                 Errors.encode(errors.stream()));

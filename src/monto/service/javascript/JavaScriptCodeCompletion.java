@@ -3,7 +3,7 @@ package monto.service.javascript;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
@@ -14,18 +14,16 @@ import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.completion.Completion;
 import monto.service.completion.Completions;
-import monto.service.filedependencies.ProductDependency;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.region.IRegion;
-import monto.service.registration.ServiceDependency;
+import monto.service.registration.ProductDependency;
 import monto.service.registration.SourceDependency;
+import monto.service.request.Request;
+import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
-import monto.service.types.Message;
-import monto.service.types.Messages;
 import monto.service.types.ParseException;
 import monto.service.types.Selection;
-import monto.service.version.VersionMessage;
 
 public class JavaScriptCodeCompletion extends MontoService {
 
@@ -39,7 +37,7 @@ public class JavaScriptCodeCompletion extends MontoService {
         		options(),
         		dependencies(
         				new SourceDependency(Languages.JAVASCRIPT),
-        				new ServiceDependency(JavaScriptServices.JAVASCRIPT_PARSER)
+        				new ProductDependency(JavaScriptServices.JAVASCRIPT_PARSER,Products.AST,Languages.JAVASCRIPT)
         		));
     }
 
@@ -50,16 +48,12 @@ public class JavaScriptCodeCompletion extends MontoService {
     }
 
     @Override
-    public ProductMessage onVersionMessage(List<Message> messages) throws ParseException {
-        VersionMessage version = Messages.getVersionMessage(messages);
-        if (!version.getLanguage().equals(Languages.JAVASCRIPT)) {
-            throw new IllegalArgumentException("wrong language in version message");
-        }
-        ProductMessage ast = Messages.getProductMessage(messages, Products.AST, Languages.JAVASCRIPT);
-        if (!ast.getLanguage().equals(Languages.JAVASCRIPT)) {
-            throw new IllegalArgumentException("wrong language in ast product message");
-        }
-
+    public ProductMessage onRequest(Request request) throws ParseException {
+    	SourceMessage version = request.getSourceMessage()
+    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVA)
+        		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
+        
         if (version.getSelections().size() > 0) {
             AST root = ASTs.decode(ast);
             List<Completion> allcompletions = allCompletions(version.getContent(), root);
@@ -73,7 +67,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                 text = text.substring(0, vStart - tStart);
             }
             String toBeCompleted = text;
-            Stream<Completion> relevant =
+            List<Completion> relevant =
                     allcompletions
                             .stream()
                             .filter(comp -> comp.getReplacement().startsWith(toBeCompleted))
@@ -81,14 +75,14 @@ public class JavaScriptCodeCompletion extends MontoService {
                                     comp.getDescription() + ": " + comp.getReplacement(),
                                     comp.getReplacement().substring(toBeCompleted.length()),
                                     version.getSelections().get(0).getStartOffset(),
-                                    comp.getIcon()));
+                                    comp.getIcon()))
+                            .collect(Collectors.toList());
 
             return productMessage(
-                    version.getVersionId(),
+                    version.getId(),
                     version.getSource(),
                     Products.COMPLETIONS,
-                    Completions.encode(relevant),
-                    new ProductDependency(ast));
+                    Completions.encode(relevant));
         }
         throw new IllegalArgumentException("Code completion needs selection");
     }
