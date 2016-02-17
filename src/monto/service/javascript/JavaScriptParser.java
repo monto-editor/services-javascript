@@ -65,6 +65,7 @@ public class JavaScriptParser extends MontoService {
                 version.getId(),
                 version.getSource(),
                 Products.AST,
+                Languages.JAVASCRIPT,
                 ASTs.encode(converter.getRoot()));
     }
 

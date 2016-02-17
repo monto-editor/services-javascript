@@ -54,6 +54,7 @@ public class JavaScriptOutliner extends MontoService {
                 version.getId(),
                 version.getSource(),
                 Products.OUTLINE,
+                Languages.JAVASCRIPT,
                 Outlines.encode(trimmer.getConverted()));
     }
 

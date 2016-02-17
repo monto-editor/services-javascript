@@ -82,6 +82,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                     version.getId(),
                     version.getSource(),
                     Products.COMPLETIONS,
+                    Languages.JAVASCRIPT,
                     Completions.encode(relevant));
         }
         throw new IllegalArgumentException("Code completion needs selection");
