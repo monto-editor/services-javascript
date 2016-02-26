@@ -51,7 +51,7 @@ public class JavaScriptCodeCompletion extends MontoService {
     public ProductMessage onRequest(Request request) throws ParseException {
     	SourceMessage version = request.getSourceMessage()
     			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
-        ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVA)
+        ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
         		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
         
         if (version.getSelections().size() > 0) {
