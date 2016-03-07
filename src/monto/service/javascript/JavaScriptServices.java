@@ -59,6 +59,7 @@ public class JavaScriptServices {
                 .addOption(required("registration", true, "address of broker registration"))
                 .addOption(required("configuration", true, "address of configuration messages"))
                 .addOption(required("resources", true, "port for resource http server"))
+                .addOption(required("dyndeps", true, "port for dynamic dependency registration"))
                 .addOption("flowlocation", true, "directory in which the flow binaries are located");
 
         CommandLineParser parser = new DefaultParser();
@@ -69,6 +70,7 @@ public class JavaScriptServices {
         		cmd.getOptionValue("address"),
         		cmd.getOptionValue("registration"),
         		cmd.getOptionValue("configuration"),
+                cmd.getOptionValue("dyndeps"),
         		Integer.parseInt(cmd.getOptionValue("resources")));
 
         resourceServer = new ResourceServer(JavaScriptServices.class.getResource("/images").getPath(), zmqConfig.getResourcePort());
