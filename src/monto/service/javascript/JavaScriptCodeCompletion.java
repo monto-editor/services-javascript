@@ -54,15 +54,15 @@ public class JavaScriptCodeCompletion extends MontoService {
         ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
         		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
         
-        if (version.getSelections().size() > 0) {
+        if (version.getSelection().isPresent()) {
             AST root = ASTs.decode(ast);
             List<Completion> allcompletions = allCompletions(version.getContent(), root);
-            List<AST> selectedPath = selectedPath(root, version.getSelections().get(0));
+            List<AST> selectedPath = selectedPath(root, version.getSelection().get());
 
             Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
             String text = extract(version.getContent(),terminalToBeCompleted).toString();
-            if (terminalToBeCompleted.getEndOffset() >= version.getSelections().get(0).getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelections().get(0).getStartOffset()) {
-                int vStart = version.getSelections().get(0).getStartOffset();
+            if (terminalToBeCompleted.getEndOffset() >= version.getSelection().get().getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelection().get().getStartOffset()) {
+                int vStart = version.getSelection().get().getStartOffset();
                 int tStart = terminalToBeCompleted.getStartOffset();
                 text = text.substring(0, vStart - tStart);
             }
@@ -74,7 +74,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                             .map(comp -> new Completion(
                                     comp.getDescription() + ": " + comp.getReplacement(),
                                     comp.getReplacement().substring(toBeCompleted.length()),
-                                    version.getSelections().get(0).getStartOffset(),
+                                    version.getSelection().get().getStartOffset(),
                                     comp.getIcon()))
                             .collect(Collectors.toList());
 
