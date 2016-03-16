@@ -12,9 +12,9 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.configuration.BooleanOption;
 import monto.service.configuration.Configuration;
-import monto.service.configuration.ConfigurationMessage;
 import monto.service.configuration.NumberOption;
 import monto.service.configuration.OptionGroup;
+import monto.service.configuration.Setting;
 import monto.service.configuration.XorOption;
 import monto.service.error.Error;
 import monto.service.error.Errors;
@@ -24,8 +24,8 @@ import monto.service.registration.ProductDependency;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
-import monto.service.token.Category;
 import monto.service.token.Token;
+import monto.service.token.TokenCategory;
 import monto.service.token.Tokens;
 import monto.service.types.Languages;
 
@@ -77,7 +77,7 @@ public class AspellSpellChecker extends MontoService {
         		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
         errors = new ArrayList<>();
-        List<Token> tokens = Tokens.decode(tokensProduct);
+        List<Token> tokens = Tokens.decodeTokenMessage(tokensProduct);
         spellCheck(tokens, version.getContent().toString());
         
         return productMessage(
@@ -90,8 +90,8 @@ public class AspellSpellChecker extends MontoService {
 
     @SuppressWarnings("rawtypes")
 	@Override
-    public void onConfigurationMessage(ConfigurationMessage message) throws Exception {
-        for (Configuration config : message.getConfigurations()) {
+    public void onConfigurationMessage(Configuration message) throws Exception {
+        for (Setting config : message.getConfigurations()) {
             switch (config.getOptionID()) {
                 case "comments":
                     comments = (boolean) config.getValue();
@@ -119,7 +119,7 @@ public class AspellSpellChecker extends MontoService {
 
     private void spellCheck(List<Token> tokens, String text) throws IOException, InterruptedException {
         for (Token token : tokens) {
-            if (token.getCategory().equals(Category.COMMENT) && comments || token.getCategory().equals(Category.STRING) && strings) {
+            if (token.getCategory().equals(TokenCategory.COMMENT) && comments || token.getCategory().equals(TokenCategory.STRING) && strings) {
                 String tokenText = text.substring(token.getStartOffset(), token.getEndOffset());
                 String[] words = tokenText.split("\\s+");
                 
@@ -131,7 +131,7 @@ public class AspellSpellChecker extends MontoService {
                         continue;
                     }
                     String[] cmd = new String[]{
-                    		"aspell", "-a", "-d", (token.getCategory().equals(Category.COMMENT) ? commentLanguage : stringLanguage)
+				"aspell", "-a", "-d", (token.getCategory().equals(TokenCategory.COMMENT) ? commentLanguage : stringLanguage)
                     };
 
                     Process p = Runtime.getRuntime().exec(cmd, null);

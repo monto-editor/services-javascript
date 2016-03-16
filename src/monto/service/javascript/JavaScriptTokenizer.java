@@ -14,14 +14,18 @@ import monto.service.product.Products;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
-import monto.service.token.Category;
+import monto.service.token.FontStore;
+import monto.service.token.Solarized;
 import monto.service.token.Token;
+import monto.service.token.TokenCategory;
 import monto.service.token.Tokens;
 import monto.service.types.Languages;
 
 public class JavaScriptTokenizer extends MontoService {
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
+    private FontStore fonts = new FontStore();
+	private Solarized theme = Solarized.dark();
 
     public JavaScriptTokenizer(ZMQConfiguration zmqConfig) {
         super(zmqConfig,
@@ -48,50 +52,47 @@ public class JavaScriptTokenizer extends MontoService {
                 version.getSource(),
                 Products.TOKENS,
                 Languages.JAVASCRIPT,
-                Tokens.encode(tokens)
+                Tokens.encodeTokens(tokens)
         );
     }
 
     private Token convertToken(org.antlr.v4.runtime.Token token) {
-        int offset = token.getStartIndex();
-        int length = token.getStopIndex() - offset + 1;
-
-        Category category;
+        TokenCategory category;
         switch (token.getType()) {
 
             case ECMAScriptLexer.SingleLineComment:
             case ECMAScriptLexer.MultiLineComment:
-                category = Category.COMMENT;
+                category = TokenCategory.COMMENT;
                 break;
 
             case ECMAScriptLexer.Const:
             case ECMAScriptLexer.NullLiteral:
-                category = Category.CONSTANT;
+                category = TokenCategory.CONSTANT;
                 break;
 
             case ECMAScriptLexer.StringLiteral:
             case ECMAScriptLexer.RegularExpressionLiteral:
-                category = Category.STRING;
+                category = TokenCategory.STRING;
                 break;
 
             case ECMAScriptLexer.DecimalLiteral:
             case ECMAScriptLexer.HexIntegerLiteral:
             case ECMAScriptLexer.OctalIntegerLiteral:
-                category = Category.NUMBER;
+                category = TokenCategory.NUMBER;
                 break;
 
             case ECMAScriptLexer.BooleanLiteral:
-                category = Category.BOOLEAN;
+                category = TokenCategory.BOOLEAN;
                 break;
 
             case ECMAScriptLexer.Identifier:
-                category = Category.IDENTIFIER;
+                category = TokenCategory.IDENTIFIER;
                 break;
 
             case ECMAScriptLexer.If:
             case ECMAScriptLexer.Else:
             case ECMAScriptLexer.Switch:
-                category = Category.CONDITIONAL;
+                category = TokenCategory.CONDITIONAL;
                 break;
 
             case ECMAScriptLexer.For:
@@ -99,12 +100,12 @@ public class JavaScriptTokenizer extends MontoService {
             case ECMAScriptLexer.While:
             case ECMAScriptLexer.Continue:
             case ECMAScriptLexer.Break:
-                category = Category.REPEAT;
+                category = TokenCategory.REPEAT;
                 break;
 
             case ECMAScriptLexer.Case:
             case ECMAScriptLexer.Default:
-                category = Category.LABEL;
+                category = TokenCategory.LABEL;
                 break;
 
             case ECMAScriptLexer.Plus:
@@ -140,20 +141,20 @@ public class JavaScriptTokenizer extends MontoService {
             case ECMAScriptLexer.IdentityNotEquals:
             case ECMAScriptLexer.QuestionMark:
             case ECMAScriptLexer.Instanceof:
-                category = Category.OPERATOR;
+                category = TokenCategory.OPERATOR;
                 break;
 
             case ECMAScriptLexer.Try:
             case ECMAScriptLexer.Catch:
             case ECMAScriptLexer.Throw:
             case ECMAScriptLexer.Finally:
-                category = Category.EXCEPTION;
+                category = TokenCategory.EXCEPTION;
                 break;
 
             case ECMAScriptLexer.Class:
             case ECMAScriptLexer.Enum:
             case ECMAScriptLexer.Interface:
-                category = Category.STRUCTURE;
+                category = TokenCategory.STRUCTURE;
                 break;
 
             case ECMAScriptLexer.Extends:
@@ -166,7 +167,7 @@ public class JavaScriptTokenizer extends MontoService {
             case ECMAScriptLexer.Return:
             case ECMAScriptLexer.Var:
             case ECMAScriptLexer.Function:
-                category = Category.KEYWORD;
+                category = TokenCategory.KEYWORD;
                 break;
 
             case ECMAScriptLexer.OpenParen:
@@ -175,25 +176,27 @@ public class JavaScriptTokenizer extends MontoService {
             case ECMAScriptLexer.CloseBrace:
             case ECMAScriptLexer.OpenBracket:
             case ECMAScriptLexer.CloseBracket:
-                category = Category.PARENTHESIS;
+                category = TokenCategory.PARENTHESIS;
                 break;
 
             case ECMAScriptLexer.Comma:
             case ECMAScriptLexer.Colon:
             case ECMAScriptLexer.Dot:
             case ECMAScriptLexer.SemiColon:
-                category = Category.DELIMITER;
+                category = TokenCategory.DELIMITER;
                 break;
 
             case ECMAScriptLexer.WhiteSpaces:
             case ECMAScriptLexer.LineTerminator:
-                category = Category.WHITESPACE;
+                category = TokenCategory.WHITESPACE;
                 break;
 
             default:
-                category = Category.UNKNOWN;
+                category = TokenCategory.UNKNOWN;
         }
 
-        return new Token(offset, length, category);
+        int offset = token.getStartIndex();
+        int length = token.getStopIndex() - offset + 1;
+        return new Token(offset, length, category, fonts.getFont(category.getColor(theme)));
     }
 }
