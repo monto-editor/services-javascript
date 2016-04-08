@@ -15,7 +15,7 @@ import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
 import monto.service.token.FontStore;
-import monto.service.token.Solarized;
+import monto.service.token.ColorTheme;
 import monto.service.token.Token;
 import monto.service.token.TokenCategory;
 import monto.service.token.Tokens;
@@ -25,7 +25,7 @@ public class JavaScriptTokenizer extends MontoService {
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
     private FontStore fonts = new FontStore();
-	private Solarized theme = Solarized.dark();
+	private ColorTheme theme = ColorTheme.solarized();
 
     public JavaScriptTokenizer(ZMQConfiguration zmqConfig) {
         super(zmqConfig,
