@@ -1,0 +1,34 @@
+apply plugin: 'java'
+sourceCompatibility = 1.8
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'assets'
+        }
+    }
+}
+
+jar {
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes('Main-Class': 'monto.service.javascript.JavaScriptServices')
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':services-base-java')
+    compile 'org.antlr:antlr4-runtime:4.5.3'
+    compile 'commons-cli:commons-cli:1.3.1'
+    compile 'org.zeromq:jeromq:0.3.5'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+}
