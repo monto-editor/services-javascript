@@ -99,7 +99,7 @@ public class JavaScriptServices {
             try {
                 services.add(new AspellSpellChecker(zmqConfig, AspellSpellChecker.getAspellLanguages()));
             } catch (IOException e) {
-                System.out.println("AspellSpellChecker could not be started: no aspell languages available\n"+e.getMessage());
+                System.err.println("AspellSpellChecker could not be started: no aspell languages available\n"+e.getMessage());
             }
         }
         
