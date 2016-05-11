@@ -29,6 +29,4 @@ dependencies {
     compile project(':services-base-java')
     compile 'org.antlr:antlr4-runtime:4.5.3'
     compile 'commons-cli:commons-cli:1.3.1'
-    compile 'org.zeromq:jeromq:0.3.5'
-    compile 'com.googlecode.json-simple:json-simple:1.1.1'
 }
