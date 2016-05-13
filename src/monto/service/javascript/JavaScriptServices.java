@@ -3,7 +3,7 @@ package monto.service.javascript;
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.resources.ResourceServer;
-import monto.service.types.ServiceID;
+import monto.service.types.ServiceId;
 import org.apache.commons.cli.*;
 import org.zeromq.ZContext;
 
@@ -13,12 +13,12 @@ import java.util.List;
 
 public class JavaScriptServices {
 
-    public static final ServiceID JAVASCRIPT_TOKENIZER = new ServiceID("javascriptTokenizer");
-    public static final ServiceID JAVASCRIPT_PARSER = new ServiceID("javascriptParser");
-    public static final ServiceID JAVASCRIPT_OUTLINER = new ServiceID("javascriptOutliner");
-    public static final ServiceID JAVASCRIPT_TYPECHECKER = new ServiceID("javascriptTypechecker");
-    public static final ServiceID JAVASCRIPT_CODE_COMPLETION = new ServiceID("javascriptCodeCompletion");
-    public static final ServiceID ASPELL_SPELLCHECKER = new ServiceID("aspellSpellChecker");
+    public static final ServiceId JAVASCRIPT_TOKENIZER = new ServiceId("javascriptTokenizer");
+    public static final ServiceId JAVASCRIPT_PARSER = new ServiceId("javascriptParser");
+    public static final ServiceId JAVASCRIPT_OUTLINER = new ServiceId("javascriptOutliner");
+    public static final ServiceId JAVASCRIPT_TYPECHECKER = new ServiceId("javascriptTypechecker");
+    public static final ServiceId JAVASCRIPT_CODE_COMPLETION = new ServiceId("javascriptCodeCompletion");
+    public static final ServiceId ASPELL_SPELLCHECKER = new ServiceId("aspellSpellChecker");
     private static ResourceServer resourceServer;
 
     public static void main(String[] args) throws Exception {
