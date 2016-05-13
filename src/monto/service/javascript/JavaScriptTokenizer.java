@@ -39,7 +39,7 @@ public class JavaScriptTokenizer extends MontoService {
     public ProductMessage onRequest(Request request) throws IOException {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
-        lexer.setInputStream(new ANTLRInputStream(version.getContent()));
+        lexer.setInputStream(new ANTLRInputStream(version.getContents()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
 
         return productMessage(

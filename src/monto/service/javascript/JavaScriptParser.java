@@ -50,7 +50,7 @@ public class JavaScriptParser extends MontoService {
     public ProductMessage onRequest(Request request) throws IOException {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
-        lexer.setInputStream(new ANTLRInputStream(version.getContent()));
+        lexer.setInputStream(new ANTLRInputStream(version.getContents()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         parser.setTokenStream(tokens);

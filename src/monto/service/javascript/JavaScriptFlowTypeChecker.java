@@ -59,7 +59,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
 
         errors = new ArrayList<>();
 
-        createSourceFile(version.getContent());
+        createSourceFile(version.getContents());
         runFlowTypecheck();
 
         return productMessage(

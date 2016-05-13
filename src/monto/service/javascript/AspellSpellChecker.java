@@ -69,7 +69,7 @@ public class AspellSpellChecker extends MontoService {
 
         errors = new ArrayList<>();
         List<Token> tokens = Tokens.decodeTokenMessage(tokensProduct);
-        spellCheck(tokens, version.getContent().toString());
+        spellCheck(tokens, version.getContents().toString());
 
         return productMessage(
                 version.getId(),

@@ -52,11 +52,11 @@ public class JavaScriptCodeCompletion extends MontoService {
 
         if (version.getSelection().isPresent()) {
             AST root = ASTs.decode(ast);
-            List<Completion> allcompletions = allCompletions(version.getContent(), root);
+            List<Completion> allcompletions = allCompletions(version.getContents(), root);
             List<AST> selectedPath = selectedPath(root, version.getSelection().get());
 
             Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
-            String text = extract(version.getContent(), terminalToBeCompleted).toString();
+            String text = extract(version.getContents(), terminalToBeCompleted).toString();
             if (terminalToBeCompleted.getEndOffset() >= version.getSelection().get().getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelection().get().getStartOffset()) {
                 int vStart = version.getSelection().get().getStartOffset();
                 int tStart = terminalToBeCompleted.getStartOffset();
