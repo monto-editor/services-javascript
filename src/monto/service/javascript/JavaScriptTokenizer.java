@@ -2,6 +2,7 @@ package monto.service.javascript;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
+import monto.service.gson.GsonMonto;
 import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
@@ -47,7 +48,7 @@ public class JavaScriptTokenizer extends MontoService {
                 version.getSource(),
                 Products.TOKENS,
                 Languages.JAVASCRIPT,
-                Tokens.encodeTokens(tokens)
+                GsonMonto.toJson(tokens)
         );
     }
 

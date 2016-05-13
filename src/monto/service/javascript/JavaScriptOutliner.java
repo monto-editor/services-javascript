@@ -6,8 +6,8 @@ import monto.service.ast.ASTVisitor;
 import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
+import monto.service.gson.GsonMonto;
 import monto.service.outline.Outline;
-import monto.service.outline.Outlines;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.region.Region;
@@ -55,7 +55,7 @@ public class JavaScriptOutliner extends MontoService {
                 version.getSource(),
                 Products.OUTLINE,
                 Languages.JAVASCRIPT,
-                Outlines.encode(trimmer.getConverted()));
+                GsonMonto.toJson(trimmer.getConverted()));
     }
 
     /**

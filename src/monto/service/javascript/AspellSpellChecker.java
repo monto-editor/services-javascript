@@ -4,7 +4,7 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.configuration.*;
 import monto.service.error.Error;
-import monto.service.error.Errors;
+import monto.service.gson.GsonMonto;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
@@ -13,7 +13,6 @@ import monto.service.request.Request;
 import monto.service.source.SourceMessage;
 import monto.service.token.Token;
 import monto.service.token.TokenCategory;
-import monto.service.token.Tokens;
 import monto.service.types.Languages;
 
 import java.io.*;
@@ -68,7 +67,7 @@ public class AspellSpellChecker extends MontoService {
                 .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
         errors = new ArrayList<>();
-        List<Token> tokens = Tokens.decodeTokenMessage(tokensProduct);
+        List<Token> tokens =GsonMonto.fromJsonArray(tokensProduct, Token[].class);
         spellCheck(tokens, version.getContents().toString());
 
         return productMessage(
@@ -76,7 +75,7 @@ public class AspellSpellChecker extends MontoService {
                 version.getSource(),
                 Products.ERRORS,
                 Languages.JAVASCRIPT,
-                Errors.encode(errors.stream()));
+                GsonMonto.toJson(errors));
     }
 
     @SuppressWarnings("rawtypes")

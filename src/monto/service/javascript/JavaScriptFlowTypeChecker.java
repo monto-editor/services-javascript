@@ -3,7 +3,7 @@ package monto.service.javascript;
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.error.Error;
-import monto.service.error.Errors;
+import monto.service.gson.GsonMonto;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
@@ -67,7 +67,8 @@ public class JavaScriptFlowTypeChecker extends MontoService {
                 version.getSource(),
                 Products.ERRORS,
                 Languages.JAVASCRIPT,
-                Errors.encode(errors.stream()));
+                GsonMonto.toJson(errors)
+        );
     }
 
     /*
