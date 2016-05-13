@@ -1,9 +1,5 @@
 package monto.service.javascript;
 
-import java.net.URL;
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.ast.ASTVisitor;
@@ -22,29 +18,33 @@ import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
 import monto.service.types.ParseException;
 
+import java.net.URL;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 public class JavaScriptOutliner extends MontoService {
 
     public JavaScriptOutliner(ZMQConfiguration zmqConfig) {
         super(zmqConfig,
-        		JavaScriptServices.JAVASCRIPT_OUTLINER,
-        		"Outline",
-        		"An outline service for JavaScript",
-        		Languages.JAVASCRIPT,
-        		Products.OUTLINE,
-        		options(),
-        		dependencies(
-        				new SourceDependency(Languages.JAVASCRIPT),
-        				new ProductDependency(JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)
-        		));
+                JavaScriptServices.JAVASCRIPT_OUTLINER,
+                "Outline",
+                "An outline service for JavaScript",
+                Languages.JAVASCRIPT,
+                Products.OUTLINE,
+                options(),
+                dependencies(
+                        new SourceDependency(Languages.JAVASCRIPT),
+                        new ProductDependency(JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)
+                ));
     }
 
     @Override
     public ProductMessage onRequest(Request request) throws ParseException {
-    	SourceMessage version = request.getSourceMessage()
-    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        SourceMessage version = request.getSourceMessage()
+                .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
-        		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
-        
+                .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
+
         NonTerminal root = (NonTerminal) ASTs.decode(ast);
 
         OutlineTrimmer trimmer = new OutlineTrimmer();

@@ -1,19 +1,5 @@
 package monto.service.javascript;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.ast.AST;
@@ -27,6 +13,19 @@ import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 public class JavaScriptParser extends MontoService {
 
@@ -36,21 +35,21 @@ public class JavaScriptParser extends MontoService {
 
     public JavaScriptParser(ZMQConfiguration zmqConfig) {
         super(zmqConfig,
-        		JavaScriptServices.JAVASCRIPT_PARSER,
-        		"Parser",
-        		"A parser that produces an AST for JavaScript using ANTLR",
-        		Languages.JAVASCRIPT,
-        		Products.AST,
-        		options(),
-        		dependencies(
-        				new SourceDependency(Languages.JAVASCRIPT)
-        		));
+                JavaScriptServices.JAVASCRIPT_PARSER,
+                "Parser",
+                "A parser that produces an AST for JavaScript using ANTLR",
+                Languages.JAVASCRIPT,
+                Products.AST,
+                options(),
+                dependencies(
+                        new SourceDependency(Languages.JAVASCRIPT)
+                ));
     }
 
     @Override
     public ProductMessage onRequest(Request request) throws IOException {
-    	SourceMessage version = request.getSourceMessage()
-    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        SourceMessage version = request.getSourceMessage()
+                .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         lexer.setInputStream(new ANTLRInputStream(version.getContent()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 

@@ -1,21 +1,8 @@
 package monto.service.javascript;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
-import monto.service.configuration.BooleanOption;
-import monto.service.configuration.Configuration;
-import monto.service.configuration.NumberOption;
-import monto.service.configuration.OptionGroup;
-import monto.service.configuration.Setting;
-import monto.service.configuration.XorOption;
+import monto.service.configuration.*;
 import monto.service.error.Error;
 import monto.service.error.Errors;
 import monto.service.product.ProductMessage;
@@ -28,6 +15,10 @@ import monto.service.token.Token;
 import monto.service.token.TokenCategory;
 import monto.service.token.Tokens;
 import monto.service.types.Languages;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AspellSpellChecker extends MontoService {
 
@@ -49,37 +40,37 @@ public class AspellSpellChecker extends MontoService {
 
     public AspellSpellChecker(ZMQConfiguration zmqConfig, List<String> languages) {
         super(zmqConfig,
-        		JavaScriptServices.ASPELL_SPELLCHECKER,
-        		"Spell checker",
-        		"Can check spelling errors using aspell",
-        		Languages.JAVASCRIPT,
-        		Products.ERRORS,
-        		options(
-        				new BooleanOption("comments", "Check comments", true),
-        				new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
-        				new BooleanOption("strings", "Check strings", true),
-        				new OptionGroup("strings", new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)),
-        				new BooleanOption("suggestions", "Show suggestions", false),
-        				new OptionGroup("suggestions", new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10))
-        		),
-        		dependencies(
-        				new SourceDependency(Languages.JAVASCRIPT),
-        				new ProductDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)
-        		));
+                JavaScriptServices.ASPELL_SPELLCHECKER,
+                "Spell checker",
+                "Can check spelling errors using aspell",
+                Languages.JAVASCRIPT,
+                Products.ERRORS,
+                options(
+                        new BooleanOption("comments", "Check comments", true),
+                        new OptionGroup("comments", new XorOption("commentLanguage", "Language for comments", languages.get(0), languages)),
+                        new BooleanOption("strings", "Check strings", true),
+                        new OptionGroup("strings", new XorOption("stringLanguage", "Language for strings", languages.get(0), languages)),
+                        new BooleanOption("suggestions", "Show suggestions", false),
+                        new OptionGroup("suggestions", new NumberOption("suggestionNumber", "Maximum number of suggestions", 5, 0, 10))
+                ),
+                dependencies(
+                        new SourceDependency(Languages.JAVASCRIPT),
+                        new ProductDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)
+                ));
         errors = new ArrayList<>();
     }
 
     @Override
     public ProductMessage onRequest(Request request) throws Exception {
-    	SourceMessage version = request.getSourceMessage()
-    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        SourceMessage version = request.getSourceMessage()
+                .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         ProductMessage tokensProduct = request.getProductMessage(Products.TOKENS, Languages.JAVASCRIPT)
-        		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
+                .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
         errors = new ArrayList<>();
         List<Token> tokens = Tokens.decodeTokenMessage(tokensProduct);
         spellCheck(tokens, version.getContent().toString());
-        
+
         return productMessage(
                 version.getId(),
                 version.getSource(),
@@ -89,7 +80,7 @@ public class AspellSpellChecker extends MontoService {
     }
 
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public void onConfigurationMessage(Configuration message) throws Exception {
         for (Setting config : message.getConfigurations()) {
             switch (config.getOptionID()) {
@@ -122,7 +113,7 @@ public class AspellSpellChecker extends MontoService {
             if (token.getCategory().equals(TokenCategory.COMMENT) && comments || token.getCategory().equals(TokenCategory.STRING) && strings) {
                 String tokenText = text.substring(token.getStartOffset(), token.getEndOffset());
                 String[] words = tokenText.split("\\s+");
-                
+
                 for (String word : words) {
                     String strippedWord = word.replaceAll("[^a-zA-Z]+", "");
                     int offset = token.getStartOffset();
@@ -131,17 +122,17 @@ public class AspellSpellChecker extends MontoService {
                         continue;
                     }
                     String[] cmd = new String[]{
-				"aspell", "-a", "-d", (token.getCategory().equals(TokenCategory.COMMENT) ? commentLanguage : stringLanguage)
+                            "aspell", "-a", "-d", (token.getCategory().equals(TokenCategory.COMMENT) ? commentLanguage : stringLanguage)
                     };
 
                     Process p = Runtime.getRuntime().exec(cmd, null);
-                    
+
                     BufferedWriter processInput = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
                     processInput.append(strippedWord);
                     processInput.newLine();
                     processInput.flush();
                     processInput.close();
-                    
+
                     BufferedReader processOutput = new BufferedReader
                             (new InputStreamReader(p.getInputStream()));
                     BufferedReader processError = new BufferedReader

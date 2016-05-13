@@ -1,11 +1,5 @@
 package monto.service.javascript;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.javascript.antlr.ECMAScriptLexer;
@@ -14,36 +8,37 @@ import monto.service.product.Products;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
-import monto.service.token.FontStore;
-import monto.service.token.ColorTheme;
-import monto.service.token.Token;
-import monto.service.token.TokenCategory;
-import monto.service.token.Tokens;
+import monto.service.token.*;
 import monto.service.types.Languages;
+import org.antlr.v4.runtime.ANTLRInputStream;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class JavaScriptTokenizer extends MontoService {
 
     private ECMAScriptLexer lexer = new ECMAScriptLexer(new ANTLRInputStream());
     private FontStore fonts = new FontStore();
-	private ColorTheme theme = ColorTheme.solarized();
+    private ColorTheme theme = ColorTheme.solarized();
 
     public JavaScriptTokenizer(ZMQConfiguration zmqConfig) {
         super(zmqConfig,
-        		JavaScriptServices.JAVASCRIPT_TOKENIZER,
-        		"Tokenizer",
-        		"A tokenizer for JavaScript that uses ANTLR for tokenizing",
-        		Languages.JAVASCRIPT,
-        		Products.TOKENS,
-        		options(),
-        		dependencies(
-        				new SourceDependency(Languages.JAVASCRIPT)
-        		));
+                JavaScriptServices.JAVASCRIPT_TOKENIZER,
+                "Tokenizer",
+                "A tokenizer for JavaScript that uses ANTLR for tokenizing",
+                Languages.JAVASCRIPT,
+                Products.TOKENS,
+                options(),
+                dependencies(
+                        new SourceDependency(Languages.JAVASCRIPT)
+                ));
     }
 
     @Override
     public ProductMessage onRequest(Request request) throws IOException {
-    	SourceMessage version = request.getSourceMessage()
-    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        SourceMessage version = request.getSourceMessage()
+                .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         lexer.setInputStream(new ANTLRInputStream(version.getContent()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
 

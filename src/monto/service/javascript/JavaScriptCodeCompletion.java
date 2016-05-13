@@ -1,17 +1,8 @@
 package monto.service.javascript;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
-import monto.service.ast.AST;
-import monto.service.ast.ASTVisitor;
-import monto.service.ast.ASTs;
-import monto.service.ast.NonTerminal;
-import monto.service.ast.Terminal;
+import monto.service.ast.*;
 import monto.service.completion.Completion;
 import monto.service.completion.Completions;
 import monto.service.product.ProductMessage;
@@ -25,20 +16,25 @@ import monto.service.types.Languages;
 import monto.service.types.ParseException;
 import monto.service.types.Selection;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class JavaScriptCodeCompletion extends MontoService {
 
     public JavaScriptCodeCompletion(ZMQConfiguration zmqConfig) {
         super(zmqConfig,
-        		JavaScriptServices.JAVASCRIPT_CODE_COMPLETION,
-        		"Code Completion",
-        		"A code completion service for JavaScript",
-        		Languages.JAVASCRIPT,
-        		Products.COMPLETIONS,
-        		options(),
-        		dependencies(
-        				new SourceDependency(Languages.JAVASCRIPT),
-        				new ProductDependency(JavaScriptServices.JAVASCRIPT_PARSER,Products.AST,Languages.JAVASCRIPT)
-        		));
+                JavaScriptServices.JAVASCRIPT_CODE_COMPLETION,
+                "Code Completion",
+                "A code completion service for JavaScript",
+                Languages.JAVASCRIPT,
+                Products.COMPLETIONS,
+                options(),
+                dependencies(
+                        new SourceDependency(Languages.JAVASCRIPT),
+                        new ProductDependency(JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)
+                ));
     }
 
     private List<Completion> allCompletions(String contents, AST root) {
@@ -49,18 +45,18 @@ public class JavaScriptCodeCompletion extends MontoService {
 
     @Override
     public ProductMessage onRequest(Request request) throws ParseException {
-    	SourceMessage version = request.getSourceMessage()
-    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+        SourceMessage version = request.getSourceMessage()
+                .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
-        		.orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
-        
+                .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
+
         if (version.getSelection().isPresent()) {
             AST root = ASTs.decode(ast);
             List<Completion> allcompletions = allCompletions(version.getContent(), root);
             List<AST> selectedPath = selectedPath(root, version.getSelection().get());
 
             Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
-            String text = extract(version.getContent(),terminalToBeCompleted).toString();
+            String text = extract(version.getContent(), terminalToBeCompleted).toString();
             if (terminalToBeCompleted.getEndOffset() >= version.getSelection().get().getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelection().get().getStartOffset()) {
                 int vStart = version.getSelection().get().getStartOffset();
                 int tStart = terminalToBeCompleted.getStartOffset();
@@ -127,7 +123,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                     .toArray();
             if (terminalChildren.length > 1) {
                 Terminal structureIdent = (Terminal) terminalChildren[1];
-                completions.add(new Completion(name, extract(content,structureIdent).toString(), icon));
+                completions.add(new Completion(name, extract(content, structureIdent).toString(), icon));
 
             }
             node.getChildren().forEach(child -> child.accept(this));
@@ -144,7 +140,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                     .stream()
                     .filter(ast -> ast instanceof Terminal)
                     .reduce((previous, current) -> current).get();
-            completions.add(new Completion(name, extract(content,structureIdent).toString(), icon));
+            completions.add(new Completion(name, extract(content, structureIdent).toString(), icon));
             node.getChildren().forEach(child -> child.accept(this));
         }
 
@@ -197,6 +193,6 @@ public class JavaScriptCodeCompletion extends MontoService {
 
 
     private static String extract(String str, AST indent) {
-    	return str.subSequence(indent.getStartOffset(), indent.getStartOffset()+indent.getLength()).toString();
+        return str.subSequence(indent.getStartOffset(), indent.getStartOffset() + indent.getLength()).toString();
     }
 }

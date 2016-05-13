@@ -1,15 +1,5 @@
 package monto.service.javascript;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.error.Error;
@@ -22,6 +12,10 @@ import monto.service.request.Request;
 import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class JavaScriptFlowTypeChecker extends MontoService {
 
     private String fileName;
@@ -33,16 +27,16 @@ public class JavaScriptFlowTypeChecker extends MontoService {
 
     public JavaScriptFlowTypeChecker(ZMQConfiguration zmqConfig, String flowLocation) {
         super(zmqConfig,
-        		JavaScriptServices.JAVASCRIPT_TYPECHECKER,
-        		"Error Checker",
-        		"Can check type errors using FlowType",
-        		Languages.JAVASCRIPT,
-        		Products.ERRORS,
-        		options(),
-        		dependencies(
-        				new SourceDependency(Languages.JAVASCRIPT),
-        				new ProductDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)
-        		));
+                JavaScriptServices.JAVASCRIPT_TYPECHECKER,
+                "Error Checker",
+                "Can check type errors using FlowType",
+                Languages.JAVASCRIPT,
+                Products.ERRORS,
+                options(),
+                dependencies(
+                        new SourceDependency(Languages.JAVASCRIPT),
+                        new ProductDependency(JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)
+                ));
 
         fileName = flowLocation + "flowTypeCheckerFile.js";
         dir = new File("./");
@@ -61,7 +55,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
     @Override
     public ProductMessage onRequest(Request request) throws Exception {
         SourceMessage version = request.getSourceMessage()
-    			.orElseThrow(() -> new IllegalArgumentException("No version message in request"));
+                .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
 
         errors = new ArrayList<>();
 
