@@ -55,7 +55,8 @@ public class JavaScriptServices {
                 .addOption(required("configuration", true, "address of configuration messages"))
                 .addOption(required("resources", true, "port for resource http server"))
                 .addOption(required("dyndeps", true, "port for dynamic dependency registration"))
-                .addOption("flowlocation", true, "directory in which the flow binaries are located");
+                .addOption("flowlocation", true, "directory in which the flow binaries are located")
+                .addOption("debug", false, "enable debugging output");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -96,6 +97,10 @@ public class JavaScriptServices {
             } catch (IOException e) {
                 System.err.println("AspellSpellChecker could not be started: no aspell languages available\n" + e.getMessage());
             }
+        }
+        if (cmd.hasOption("debug")) {
+            for (MontoService service : services)
+                service.enableDebugging();
         }
 
         for (MontoService service : services) {
