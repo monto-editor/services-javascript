@@ -3,9 +3,9 @@ package monto.service.javascript;
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.ast.AST;
-import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
+import monto.service.gson.GsonMonto;
 import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
@@ -65,7 +65,8 @@ public class JavaScriptParser extends MontoService {
                 version.getSource(),
                 Products.AST,
                 Languages.JAVASCRIPT,
-                ASTs.encode(converter.getRoot()));
+                GsonMonto.toJsonTree(converter.getRoot())
+        );
     }
 
     private static class Converter implements ParseTreeListener {

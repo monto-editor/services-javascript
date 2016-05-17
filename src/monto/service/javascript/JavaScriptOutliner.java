@@ -2,8 +2,8 @@ package monto.service.javascript;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
+import monto.service.ast.AST;
 import monto.service.ast.ASTVisitor;
-import monto.service.ast.ASTs;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.gson.GsonMonto;
@@ -45,7 +45,7 @@ public class JavaScriptOutliner extends MontoService {
         ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
                 .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
-        NonTerminal root = (NonTerminal) ASTs.decode(ast);
+        NonTerminal root = (NonTerminal) GsonMonto.fromJson(ast, AST.class);
 
         OutlineTrimmer trimmer = new OutlineTrimmer();
         root.accept(trimmer);
@@ -55,7 +55,7 @@ public class JavaScriptOutliner extends MontoService {
                 version.getSource(),
                 Products.OUTLINE,
                 Languages.JAVASCRIPT,
-                GsonMonto.toJson(trimmer.getConverted()));
+                GsonMonto.toJsonTree(trimmer.getConverted()));
     }
 
     /**

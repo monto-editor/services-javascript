@@ -48,7 +48,7 @@ public class JavaScriptTokenizer extends MontoService {
                 version.getSource(),
                 Products.TOKENS,
                 Languages.JAVASCRIPT,
-                GsonMonto.toJson(tokens)
+                GsonMonto.toJsonTree(tokens)
         );
     }
 

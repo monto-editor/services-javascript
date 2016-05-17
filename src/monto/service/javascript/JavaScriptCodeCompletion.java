@@ -51,7 +51,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                 .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
         if (version.getSelection().isPresent()) {
-            AST root = ASTs.decode(ast);
+            AST root = GsonMonto.fromJson(ast, AST.class);
             List<Completion> allcompletions = allCompletions(version.getContents(), root);
             List<AST> selectedPath = selectedPath(root, version.getSelection().get());
 
@@ -79,7 +79,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                     version.getSource(),
                     Products.COMPLETIONS,
                     Languages.JAVASCRIPT,
-                    GsonMonto.toJson(relevant));
+                    GsonMonto.toJsonTree(relevant));
         }
         throw new IllegalArgumentException("Code completion needs selection");
     }

@@ -75,7 +75,7 @@ public class AspellSpellChecker extends MontoService {
                 version.getSource(),
                 Products.ERRORS,
                 Languages.JAVASCRIPT,
-                GsonMonto.toJson(errors));
+                GsonMonto.toJsonTree(errors));
     }
 
     @SuppressWarnings("rawtypes")
