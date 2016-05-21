@@ -1,11 +1,5 @@
-apply plugin: 'java'
-sourceCompatibility = 1.8
-
 sourceSets {
     main {
-        java {
-            srcDir 'src'
-        }
         resources {
             srcDir 'assets'
         }
@@ -13,16 +7,9 @@ sourceSets {
 }
 
 jar {
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
     manifest {
         attributes('Main-Class': 'monto.service.javascript.JavaScriptServices')
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
