@@ -81,8 +81,8 @@ public class AspellSpellChecker extends MontoService {
     @SuppressWarnings("rawtypes")
     @Override
     public void onConfigurationMessage(Configuration message) throws Exception {
-        for (Setting config : message.getConfigurations()) {
-            switch (config.getOptionID()) {
+        for (Setting config : message.getSettings()) {
+            switch (config.getOptionId()) {
                 case "comments":
                     comments = (boolean) config.getValue();
                     break;
