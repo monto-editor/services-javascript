@@ -2,7 +2,10 @@ package monto.service.javascript;
 
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
-import monto.service.ast.*;
+import monto.service.ast.AST;
+import monto.service.ast.ASTVisitor;
+import monto.service.ast.NonTerminal;
+import monto.service.ast.Terminal;
 import monto.service.completion.Completion;
 import monto.service.gson.GsonMonto;
 import monto.service.product.ProductMessage;
@@ -44,7 +47,7 @@ public class JavaScriptCodeCompletion extends MontoService {
     }
 
     @Override
-    public ProductMessage onRequest(Request request) throws ParseException {
+    public void onRequest(Request request) throws ParseException {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
@@ -74,7 +77,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                                     comp.getIcon()))
                             .collect(Collectors.toList());
 
-            return productMessage(
+            sendProductMessage(
                     version.getId(),
                     version.getSource(),
                     Products.COMPLETIONS,

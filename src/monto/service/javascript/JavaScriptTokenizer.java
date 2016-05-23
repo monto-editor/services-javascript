@@ -4,12 +4,14 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.gson.GsonMonto;
 import monto.service.javascript.antlr.ECMAScriptLexer;
-import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
-import monto.service.token.*;
+import monto.service.token.ColorTheme;
+import monto.service.token.FontStore;
+import monto.service.token.Token;
+import monto.service.token.TokenCategory;
 import monto.service.types.Languages;
 import org.antlr.v4.runtime.ANTLRInputStream;
 
@@ -37,13 +39,13 @@ public class JavaScriptTokenizer extends MontoService {
     }
 
     @Override
-    public ProductMessage onRequest(Request request) throws IOException {
+    public void onRequest(Request request) throws IOException {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         lexer.setInputStream(new ANTLRInputStream(version.getContents()));
         List<Token> tokens = lexer.getAllTokens().stream().map(token -> convertToken(token)).collect(Collectors.toList());
 
-        return productMessage(
+        sendProductMessage(
                 version.getId(),
                 version.getSource(),
                 Products.TOKENS,

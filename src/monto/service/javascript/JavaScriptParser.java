@@ -7,7 +7,6 @@ import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
 import monto.service.gson.GsonMonto;
 import monto.service.javascript.antlr.ECMAScriptLexer;
-import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
@@ -47,7 +46,7 @@ public class JavaScriptParser extends MontoService {
     }
 
     @Override
-    public ProductMessage onRequest(Request request) throws IOException {
+    public void onRequest(Request request) throws IOException {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         lexer.setInputStream(new ANTLRInputStream(version.getContents()));
@@ -60,7 +59,7 @@ public class JavaScriptParser extends MontoService {
         Converter converter = new Converter();
         walker.walk(converter, root);
 
-        return productMessage(
+        sendProductMessage(
                 version.getId(),
                 version.getSource(),
                 Products.AST,

@@ -60,17 +60,17 @@ public class AspellSpellChecker extends MontoService {
     }
 
     @Override
-    public ProductMessage onRequest(Request request) throws Exception {
+    public void onRequest(Request request) throws Exception {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
         ProductMessage tokensProduct = request.getProductMessage(Products.TOKENS, Languages.JAVASCRIPT)
                 .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
         errors = new ArrayList<>();
-        List<Token> tokens =GsonMonto.fromJsonArray(tokensProduct, Token[].class);
+        List<Token> tokens = GsonMonto.fromJsonArray(tokensProduct, Token[].class);
         spellCheck(tokens, version.getContents().toString());
 
-        return productMessage(
+        sendProductMessage(
                 version.getId(),
                 version.getSource(),
                 Products.ERRORS,

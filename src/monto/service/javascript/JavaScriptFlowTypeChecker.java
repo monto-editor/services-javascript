@@ -4,7 +4,6 @@ import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.error.Error;
 import monto.service.gson.GsonMonto;
-import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
 import monto.service.registration.SourceDependency;
@@ -53,7 +52,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
     }
 
     @Override
-    public ProductMessage onRequest(Request request) throws Exception {
+    public void onRequest(Request request) throws Exception {
         SourceMessage version = request.getSourceMessage()
                 .orElseThrow(() -> new IllegalArgumentException("No version message in request"));
 
@@ -62,7 +61,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
         createSourceFile(version.getContents());
         runFlowTypecheck();
 
-        return productMessage(
+        sendProductMessage(
                 version.getId(),
                 version.getSource(),
                 Products.ERRORS,
