@@ -10,14 +10,12 @@ import monto.service.completion.Completion;
 import monto.service.gson.GsonMonto;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
-import monto.service.region.IRegion;
 import monto.service.registration.ProductDependency;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
 import monto.service.types.ParseException;
-import monto.service.types.Selection;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,38 +51,25 @@ public class JavaScriptCodeCompletion extends MontoService {
         ProductMessage ast = request.getProductMessage(Products.AST, Languages.JAVASCRIPT)
                 .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
-        if (version.getSelection().isPresent()) {
-            AST root = GsonMonto.fromJson(ast, AST.class);
-            List<Completion> allcompletions = allCompletions(version.getContents(), root);
-            List<AST> selectedPath = selectedPath(root, version.getSelection().get());
+        AST root = GsonMonto.fromJson(ast, AST.class);
+        List<Completion> allcompletions = allCompletions(version.getContents(), root);
 
-            Terminal terminalToBeCompleted = (Terminal) selectedPath.get(0);
-            String text = extract(version.getContents(), terminalToBeCompleted).toString();
-            if (terminalToBeCompleted.getEndOffset() >= version.getSelection().get().getStartOffset() && terminalToBeCompleted.getStartOffset() <= version.getSelection().get().getStartOffset()) {
-                int vStart = version.getSelection().get().getStartOffset();
-                int tStart = terminalToBeCompleted.getStartOffset();
-                text = text.substring(0, vStart - tStart);
-            }
-            String toBeCompleted = text;
-            List<Completion> relevant =
-                    allcompletions
-                            .stream()
-                            .filter(comp -> comp.getReplacement().startsWith(toBeCompleted))
-                            .map(comp -> new Completion(
-                                    comp.getDescription() + ": " + comp.getReplacement(),
-                                    comp.getReplacement().substring(toBeCompleted.length()),
-                                    version.getSelection().get().getStartOffset(),
-                                    comp.getIcon()))
-                            .collect(Collectors.toList());
+        List<Completion> relevant =
+                allcompletions
+                        .stream()
+                        .map(comp -> new Completion(
+                                comp.getDescription() + ": " + comp.getReplacement(),
+                                comp.getReplacement(),
+                                0,
+                                comp.getIcon()))
+                        .collect(Collectors.toList());
 
-            sendProductMessage(
-                    version.getId(),
-                    version.getSource(),
-                    Products.COMPLETIONS,
-                    Languages.JAVASCRIPT,
-                    GsonMonto.toJsonTree(relevant));
-        }
-        throw new IllegalArgumentException("Code completion needs selection");
+        sendProductMessage(
+                version.getId(),
+                version.getSource(),
+                Products.COMPLETIONS,
+                Languages.JAVASCRIPT,
+                GsonMonto.toJsonTree(relevant));
     }
 
     private class AllCompletions implements ASTVisitor {
@@ -126,7 +111,7 @@ public class JavaScriptCodeCompletion extends MontoService {
                     .toArray();
             if (terminalChildren.length > 1) {
                 Terminal structureIdent = (Terminal) terminalChildren[1];
-                completions.add(new Completion(name, extract(content, structureIdent).toString(), icon));
+                completions.add(new Completion(name, structureIdent.extract(content), icon));
 
             }
             node.getChildren().forEach(child -> child.accept(this));
@@ -134,7 +119,6 @@ public class JavaScriptCodeCompletion extends MontoService {
 
         @Override
         public void visit(Terminal token) {
-
         }
 
         private void structureDeclaration(NonTerminal node, String name, URL icon) {
@@ -143,59 +127,12 @@ public class JavaScriptCodeCompletion extends MontoService {
                     .stream()
                     .filter(ast -> ast instanceof Terminal)
                     .reduce((previous, current) -> current).get();
-            completions.add(new Completion(name, extract(content, structureIdent).toString(), icon));
+            completions.add(new Completion(name, structureIdent.extract(content), icon));
             node.getChildren().forEach(child -> child.accept(this));
         }
 
         public List<Completion> getCompletions() {
             return completions;
         }
-    }
-
-    private static List<AST> selectedPath(AST root, Selection sel) {
-        SelectedPath finder = new SelectedPath(sel);
-        root.accept(finder);
-        return finder.getSelected();
-    }
-
-    private static class SelectedPath implements ASTVisitor {
-
-        private Selection selection;
-        private List<AST> selectedPath = new ArrayList<>();
-
-        public SelectedPath(Selection selection) {
-            this.selection = selection;
-        }
-
-        @Override
-        public void visit(NonTerminal node) {
-            node.getChildren()
-                    .stream()
-                    .forEach(child -> child.accept(this));
-        }
-
-        @Override
-        public void visit(Terminal token) {
-            if (rightBehind(selection, token))
-                selectedPath.add(token);
-        }
-
-        public List<AST> getSelected() {
-            return selectedPath;
-        }
-
-        private static boolean rightBehind(IRegion region1, IRegion region2) {
-            try {
-                return region1.getStartOffset() <= region2.getEndOffset() && region1.getStartOffset() >= region2.getStartOffset();
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-    }
-
-
-    private static String extract(String str, AST indent) {
-        return str.subSequence(indent.getStartOffset(), indent.getStartOffset() + indent.getLength()).toString();
     }
 }
