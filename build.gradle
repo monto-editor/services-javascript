@@ -1,5 +1,28 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+group = "monto"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+// If there is a new commit on the master branch of 'services-base-java', the dependency is not queried by default, because the identifier doesn't change.
+// To always refresh dependencies on a Gradle build, the cache needs to be disabled.
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 sourceSets {
     main {
+        java {
+            srcDir 'src'
+        }
         resources {
             srcDir 'assets'
         }
@@ -13,7 +36,13 @@ jar {
 }
 
 dependencies {
-    compile project(':services-base-java')
+    // Multi project 'services-gradle' sets 'isPartOfMultiProject' property
+    if (project.hasProperty('isPartOfMultiProject')) {
+        compile project(':services-base-java')
+    } else {
+        compile 'com.github.monto-editor:services-base-java:master-SNAPSHOT'
+    }
+
     compile 'org.antlr:antlr4-runtime:4.5.3'
     compile 'commons-cli:commons-cli:1.3.1'
 }
