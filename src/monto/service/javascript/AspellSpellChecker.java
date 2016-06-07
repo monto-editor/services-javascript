@@ -1,23 +1,29 @@
 package monto.service.javascript;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
-import monto.service.configuration.*;
+import monto.service.configuration.BooleanOption;
+import monto.service.configuration.Configuration;
+import monto.service.configuration.NumberOption;
+import monto.service.configuration.OptionGroup;
+import monto.service.configuration.Setting;
+import monto.service.configuration.XorOption;
 import monto.service.error.Error;
 import monto.service.gson.GsonMonto;
+import monto.service.highlighting.Token;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
-import monto.service.token.Token;
-import monto.service.token.TokenCategory;
 import monto.service.types.Languages;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AspellSpellChecker extends MontoService {
 
@@ -108,7 +114,9 @@ public class AspellSpellChecker extends MontoService {
     }
 
     private void spellCheck(List<Token> tokens, String text) throws IOException, InterruptedException {
-        for (Token token : tokens) {
+	// FIXME Find out another way to extract comments and strings
+	/*
+	for (Token token : tokens) {
             if (token.getCategory().equals(TokenCategory.COMMENT) && comments || token.getCategory().equals(TokenCategory.STRING) && strings) {
                 String tokenText = text.substring(token.getStartOffset(), token.getEndOffset());
                 String[] words = tokenText.split("\\s+");
@@ -144,6 +152,7 @@ public class AspellSpellChecker extends MontoService {
                 }
             }
         }
+        */
     }
 
     private void handleAspellInput(BufferedReader processOutput, int offset, String word) throws IOException {
