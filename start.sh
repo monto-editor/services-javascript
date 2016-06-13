@@ -2,14 +2,9 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-eclipse_jar="$DIR/dist/services-javascript.jar"
-gradle_jar="$DIR/build/libs/services-javascript.jar"
+gradle_shadow_jar="$DIR/build/libs/services-javascript-all.jar"
 
-if [ -f "$eclipse_jar" ]; then
-    jar="$eclipse_jar"
-elif [ -f "$gradle_jar" ]; then
-    jar="$gradle_jar"
-else
+if [ ! -f "$gradle_shadow_jar" ]; then
     printf "No jar found. Please build the project first.\n" >&2
     exit 99
 fi
