@@ -1,33 +1,33 @@
 buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
     }
-    dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.3"
-    }
+  }
+  dependencies {
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+  }
 }
 
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-group = "monto"
+group = 'monto'
 
 sourceCompatibility = 1.8
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 jar {
-    manifest {
-        attributes('Main-Class': 'monto.service.python.PythonServices')
-    }
+  manifest {
+    attributes('Main-Class': 'monto.service.python.PythonServices')
+  }
 }
 
 dependencies {
-    compile project(':services-base-java')
-    compile 'org.antlr:antlr4-runtime:4.5.3'
-    compile 'commons-cli:commons-cli:1.3.1'
+  compile project(':services-base-java')
+  compile 'org.antlr:antlr4-runtime:4.5.3'
+  compile 'commons-cli:commons-cli:1.3.1'
 }
