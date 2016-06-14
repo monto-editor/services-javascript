@@ -55,9 +55,7 @@ public class JavaScriptServices {
         .addOption("s", false, "enable javascript Aspell spelling error checker")
         .addOption(required("address", true, "address of services"))
         .addOption(required("registration", true, "address of broker registration"))
-        .addOption(required("configuration", true, "address of configuration messages"))
         .addOption(required("resources", true, "port for resource http server"))
-        .addOption(required("dyndeps", true, "port for dynamic dependency registration"))
         .addOption("flowlocation", true, "directory in which the flow binaries are located")
         .addOption("debug", false, "enable debugging output");
 
@@ -69,8 +67,6 @@ public class JavaScriptServices {
             context,
             cmd.getOptionValue("address"),
             cmd.getOptionValue("registration"),
-            cmd.getOptionValue("configuration"),
-            cmd.getOptionValue("dyndeps"),
             Integer.parseInt(cmd.getOptionValue("resources")));
 
     resourceServer =

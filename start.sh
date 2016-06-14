@@ -12,8 +12,6 @@ fi
 java -jar "$gradle_shadow_jar" \
      -t -p -o -c -f -s \
      -address tcp://* \
-     -registration tcp://*:5004 \
-     -configuration tcp://*:5007 \
+     -registration tcp://*:5002 \
      -resources 5051 \
-     -dyndeps tcp://*:5009 \
      -flowlocation dist/
