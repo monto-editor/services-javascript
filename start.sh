@@ -9,7 +9,7 @@ if [ ! -f "$gradle_shadow_jar" ]; then
     exit 99
 fi
 
-java -jar "$jar" \
+java -jar "$gradle_shadow_jar" \
      -t -p -o -c -f -s \
      -address tcp://* \
      -registration tcp://*:5004 \
