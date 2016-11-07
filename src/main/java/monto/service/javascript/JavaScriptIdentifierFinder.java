@@ -1,17 +1,16 @@
 package monto.service.javascript;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import monto.service.MontoService;
 import monto.service.ZMQConfiguration;
 import monto.service.ast.AST;
 import monto.service.ast.ASTVisitor;
 import monto.service.ast.NonTerminal;
 import monto.service.ast.Terminal;
-import monto.service.completion.Completion;
 import monto.service.gson.GsonMonto;
+import monto.service.identifier.Identifier;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
@@ -22,27 +21,20 @@ import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
 import monto.service.types.ParseException;
 
-public class JavaScriptCodeCompletion extends MontoService {
+public class JavaScriptIdentifierFinder extends MontoService {
 
-  public JavaScriptCodeCompletion(ZMQConfiguration zmqConfig) {
+  public JavaScriptIdentifierFinder(ZMQConfiguration zmqConfig) {
     super(
         zmqConfig,
-        JavaScriptServices.JAVASCRIPT_CODE_COMPLETION,
-        "Code Completion",
-        "A code completion service for JavaScript",
-        productDescriptions(new ProductDescription(Products.COMPLETIONS, Languages.JAVASCRIPT)),
+        JavaScriptServices.IDENTIFIER_FINDER,
+        "Identifer Finder",
+        "Searches AST for identifiers",
+        productDescriptions(new ProductDescription(Products.IDENTIFIER, Languages.JAVASCRIPT)),
         options(),
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
-            new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)),
+            new ProductDependency(JavaScriptServices.PARSER, Products.AST, Languages.JAVASCRIPT)),
         commands());
-  }
-
-  private List<Completion> allCompletions(String contents, AST root) {
-    AllCompletions completionVisitor = new AllCompletions(contents);
-    root.accept(completionVisitor);
-    return completionVisitor.getCompletions();
   }
 
   @Override
@@ -57,34 +49,24 @@ public class JavaScriptCodeCompletion extends MontoService {
             .orElseThrow(() -> new IllegalArgumentException("No AST message in request"));
 
     AST root = GsonMonto.fromJson(ast, AST.class);
-    List<Completion> allcompletions = allCompletions(version.getContents(), root);
-
-    List<Completion> relevant =
-        allcompletions
-            .stream()
-            .map(
-                comp
-                    -> new Completion(
-                        comp.getDescription() + ": " + comp.getReplacement(),
-                        comp.getReplacement(),
-                        0,
-                        comp.getIcon()))
-            .collect(Collectors.toList());
+    IdentifierVisitor identifierVisitor = new IdentifierVisitor(version.getContents());
+    root.accept(identifierVisitor);
+    List<Identifier> identifiers = identifierVisitor.getIdentifiers();
 
     sendProductMessage(
         version.getId(),
         version.getSource(),
-        Products.COMPLETIONS,
+        Products.IDENTIFIER,
         Languages.JAVASCRIPT,
-        GsonMonto.toJsonTree(relevant));
+        GsonMonto.toJsonTree(identifiers));
   }
 
-  private class AllCompletions implements ASTVisitor {
+  private class IdentifierVisitor implements ASTVisitor {
 
-    private List<Completion> completions = new ArrayList<>();
+    private List<Identifier> identifiers = new ArrayList<>();
     private String content;
 
-    public AllCompletions(String content) {
+    public IdentifierVisitor(String content) {
       this.content = content;
     }
 
@@ -92,31 +74,32 @@ public class JavaScriptCodeCompletion extends MontoService {
     public void visit(NonTerminal node) {
       switch (node.getName()) {
         case "Class":
-          structureDeclaration(node, "class", getResource("class.png"));
+          structureDeclaration(node, "class");
           break;
 
         case "Const":
-          structureDeclaration(node, "const", getResource("const.png"));
+          structureDeclaration(node, "constant");
           break;
 
         case "variableDeclaration":
-          structureDeclaration(node, "var", getResource("variable.png"));
+          structureDeclaration(node, "variable");
           break;
 
         case "functionDeclaration":
-          addFuncToConverted(node, "function", getResource("public.png"));
+          addFuncToConverted(node, "method");
 
         default:
           node.getChildren().forEach(child -> child.accept(this));
       }
     }
 
-    private void addFuncToConverted(NonTerminal node, String name, URL icon) {
+    private void addFuncToConverted(NonTerminal node, String type) {
       Object[] terminalChildren =
           node.getChildren().stream().filter(ast -> ast instanceof Terminal).toArray();
       if (terminalChildren.length > 1) {
         Terminal structureIdent = (Terminal) terminalChildren[1];
-        completions.add(new Completion(name, structureIdent.extract(content), icon));
+        String identifier = structureIdent.extract(content);
+        identifiers.add(new Identifier(identifier, type));
       }
       node.getChildren().forEach(child -> child.accept(this));
     }
@@ -124,7 +107,7 @@ public class JavaScriptCodeCompletion extends MontoService {
     @Override
     public void visit(Terminal token) {}
 
-    private void structureDeclaration(NonTerminal node, String name, URL icon) {
+    private void structureDeclaration(NonTerminal node, String type) {
       Terminal structureIdent =
           (Terminal)
               node.getChildren()
@@ -132,12 +115,13 @@ public class JavaScriptCodeCompletion extends MontoService {
                   .filter(ast -> ast instanceof Terminal)
                   .reduce((previous, current) -> current)
                   .get();
-      completions.add(new Completion(name, structureIdent.extract(content), icon));
+      String identifier = structureIdent.extract(content);
+      identifiers.add(new Identifier(identifier, type));
       node.getChildren().forEach(child -> child.accept(this));
     }
 
-    public List<Completion> getCompletions() {
-      return completions;
+    public List<Identifier> getIdentifiers() {
+      return identifiers;
     }
   }
 }

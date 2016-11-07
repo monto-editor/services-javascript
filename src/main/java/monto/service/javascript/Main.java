@@ -93,7 +93,7 @@ public class Main {
       services.add(new JavaScriptIdentifierFinder(zmqConfig));
     }
     if (cmd.hasOption("codecompletioner")) {
-      services.add(new JavaScriptCodeCompletion(zmqConfig));
+      services.add(new JavaScriptCodeCompletioner(zmqConfig));
     }
     if (cmd.hasOption("flowtypechecker")) {
       services.add(new JavaScriptFlowTypeChecker(zmqConfig, flowLocation));
