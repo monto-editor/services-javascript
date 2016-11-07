@@ -25,7 +25,7 @@ public class JavaScriptTokenizer extends MontoService {
   public JavaScriptTokenizer(ZMQConfiguration zmqConfig) {
     super(
         zmqConfig,
-        JavaScriptServices.JAVASCRIPT_TOKENIZER,
+        JavaScriptServices.TOKENIZER,
         "Tokenizer",
         "A tokenizer for JavaScript that uses ANTLR for tokenizing",
         productDescriptions(new ProductDescription(Products.TOKENS, Languages.JAVASCRIPT)),

@@ -32,7 +32,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
   public JavaScriptFlowTypeChecker(ZMQConfiguration zmqConfig, String flowLocation) {
     super(
         zmqConfig,
-        JavaScriptServices.JAVASCRIPT_TYPECHECKER,
+        JavaScriptServices.TYPECHECKER,
         "Error Checker",
         "Can check type errors using FlowType",
         productDescriptions(new ProductDescription(Products.ERRORS, Languages.JAVASCRIPT)),
@@ -40,7 +40,7 @@ public class JavaScriptFlowTypeChecker extends MontoService {
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
             new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)),
+                JavaScriptServices.TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)),
         commands());
 
     fileName = flowLocation + "flowTypeCheckerFile.js";

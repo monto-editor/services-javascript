@@ -68,7 +68,7 @@ public class AspellSpellChecker extends MontoService {
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
             new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)),
+                JavaScriptServices.TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)),
         commands());
     errors = new ArrayList<>();
   }

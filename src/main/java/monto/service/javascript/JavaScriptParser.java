@@ -37,7 +37,7 @@ public class JavaScriptParser extends MontoService {
   public JavaScriptParser(ZMQConfiguration zmqConfig) {
     super(
         zmqConfig,
-        JavaScriptServices.JAVASCRIPT_PARSER,
+        JavaScriptServices.PARSER,
         "Parser",
         "A parser that produces an AST for JavaScript using ANTLR",
         productDescriptions(new ProductDescription(Products.AST, Languages.JAVASCRIPT)),

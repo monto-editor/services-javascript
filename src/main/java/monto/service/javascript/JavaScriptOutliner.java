@@ -27,15 +27,14 @@ public class JavaScriptOutliner extends MontoService {
   public JavaScriptOutliner(ZMQConfiguration zmqConfig) {
     super(
         zmqConfig,
-        JavaScriptServices.JAVASCRIPT_OUTLINER,
+        JavaScriptServices.OUTLINER,
         "Outline",
         "An outline service for JavaScript",
         productDescriptions(new ProductDescription(Products.OUTLINE, Languages.JAVASCRIPT)),
         options(),
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
-            new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)),
+            new ProductDependency(JavaScriptServices.PARSER, Products.AST, Languages.JAVASCRIPT)),
         commands());
   }
 
