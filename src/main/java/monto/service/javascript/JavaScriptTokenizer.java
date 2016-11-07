@@ -12,6 +12,7 @@ import monto.service.highlighting.Token;
 import monto.service.highlighting.TokenCategory;
 import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.product.Products;
+import monto.service.registration.ProductDescription;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
@@ -27,10 +28,10 @@ public class JavaScriptTokenizer extends MontoService {
         JavaScriptServices.JAVASCRIPT_TOKENIZER,
         "Tokenizer",
         "A tokenizer for JavaScript that uses ANTLR for tokenizing",
-        Languages.JAVASCRIPT,
-        Products.TOKENS,
+        productDescriptions(new ProductDescription(Products.TOKENS, Languages.JAVASCRIPT)),
         options(),
-        dependencies(new SourceDependency(Languages.JAVASCRIPT)));
+        dependencies(new SourceDependency(Languages.JAVASCRIPT)),
+        commands());
   }
 
   @Override

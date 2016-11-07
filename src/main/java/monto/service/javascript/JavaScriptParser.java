@@ -21,6 +21,7 @@ import monto.service.ast.Terminal;
 import monto.service.gson.GsonMonto;
 import monto.service.javascript.antlr.ECMAScriptLexer;
 import monto.service.product.Products;
+import monto.service.registration.ProductDescription;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
@@ -39,10 +40,10 @@ public class JavaScriptParser extends MontoService {
         JavaScriptServices.JAVASCRIPT_PARSER,
         "Parser",
         "A parser that produces an AST for JavaScript using ANTLR",
-        Languages.JAVASCRIPT,
-        Products.AST,
+        productDescriptions(new ProductDescription(Products.AST, Languages.JAVASCRIPT)),
         options(),
-        dependencies(new SourceDependency(Languages.JAVASCRIPT)));
+        dependencies(new SourceDependency(Languages.JAVASCRIPT)),
+        commands());
   }
 
   @Override

@@ -15,6 +15,7 @@ import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.region.Region;
 import monto.service.registration.ProductDependency;
+import monto.service.registration.ProductDescription;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
@@ -29,13 +30,13 @@ public class JavaScriptOutliner extends MontoService {
         JavaScriptServices.JAVASCRIPT_OUTLINER,
         "Outline",
         "An outline service for JavaScript",
-        Languages.JAVASCRIPT,
-        Products.OUTLINE,
+        productDescriptions(new ProductDescription(Products.OUTLINE, Languages.JAVASCRIPT)),
         options(),
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
             new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)));
+                JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)),
+        commands());
   }
 
   @Override

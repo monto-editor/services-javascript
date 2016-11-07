@@ -15,6 +15,7 @@ import monto.service.error.Error;
 import monto.service.gson.GsonMonto;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
+import monto.service.registration.ProductDescription;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
@@ -34,13 +35,13 @@ public class JavaScriptFlowTypeChecker extends MontoService {
         JavaScriptServices.JAVASCRIPT_TYPECHECKER,
         "Error Checker",
         "Can check type errors using FlowType",
-        Languages.JAVASCRIPT,
-        Products.ERRORS,
+        productDescriptions(new ProductDescription(Products.ERRORS, Languages.JAVASCRIPT)),
         options(),
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
             new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)));
+                JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)),
+        commands());
 
     fileName = flowLocation + "flowTypeCheckerFile.js";
     dir = new File("./");

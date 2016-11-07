@@ -15,6 +15,7 @@ import monto.service.gson.GsonMonto;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
+import monto.service.registration.ProductDescription;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
@@ -29,13 +30,13 @@ public class JavaScriptCodeCompletion extends MontoService {
         JavaScriptServices.JAVASCRIPT_CODE_COMPLETION,
         "Code Completion",
         "A code completion service for JavaScript",
-        Languages.JAVASCRIPT,
-        Products.COMPLETIONS,
+        productDescriptions(new ProductDescription(Products.COMPLETIONS, Languages.JAVASCRIPT)),
         options(),
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
             new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)));
+                JavaScriptServices.JAVASCRIPT_PARSER, Products.AST, Languages.JAVASCRIPT)),
+        commands());
   }
 
   private List<Completion> allCompletions(String contents, AST root) {

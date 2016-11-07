@@ -19,6 +19,7 @@ import monto.service.highlighting.Token;
 import monto.service.product.ProductMessage;
 import monto.service.product.Products;
 import monto.service.registration.ProductDependency;
+import monto.service.registration.ProductDescription;
 import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
@@ -48,8 +49,7 @@ public class AspellSpellChecker extends MontoService {
         JavaScriptServices.ASPELL_SPELLCHECKER,
         "Spell checker",
         "Can check spelling errors using aspell",
-        Languages.JAVASCRIPT,
-        Products.ERRORS,
+        productDescriptions(new ProductDescription(Products.ERRORS, Languages.JAVASCRIPT)),
         options(
             new BooleanOption("comments", "Check comments", true),
             new OptionGroup(
@@ -68,7 +68,8 @@ public class AspellSpellChecker extends MontoService {
         dependencies(
             new SourceDependency(Languages.JAVASCRIPT),
             new ProductDependency(
-                JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)));
+                JavaScriptServices.JAVASCRIPT_TOKENIZER, Products.TOKENS, Languages.JAVASCRIPT)),
+        commands());
     errors = new ArrayList<>();
   }
 
