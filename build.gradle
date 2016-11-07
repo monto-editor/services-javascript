@@ -24,7 +24,7 @@ repositories {
 
 jar {
   manifest {
-    attributes('Main-Class': 'monto.service.python.PythonServices')
+    attributes('Main-Class': 'monto.service.javascript.Main')
   }
 }
 
