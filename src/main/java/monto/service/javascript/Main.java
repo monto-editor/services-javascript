@@ -69,7 +69,7 @@ public class Main {
 
     resourceServer =
         new ResourceServer(
-            Main.class.getResource("/images").toExternalForm(), zmqConfig.getResourcePort());
+            Main.class.getResource("/icons").toExternalForm(), zmqConfig.getResourcePort());
     try {
       resourceServer.start();
     } catch (Exception e) {

@@ -88,7 +88,7 @@ public class JavaScriptOutliner extends MontoService {
           break;
 
         case "Const":
-          addVarToConverted(node, "const", getResource("const.png"));
+          addVarToConverted(node, "const", getResource("variable.png"));
           break;
 
         case "variableDeclaration":
@@ -96,7 +96,7 @@ public class JavaScriptOutliner extends MontoService {
           break;
 
         case "functionDeclaration":
-          addFuncToConverted(node, "function", getResource("public.png"));
+          addFuncToConverted(node, "function", getResource("method.png"));
           break;
 
         default:
