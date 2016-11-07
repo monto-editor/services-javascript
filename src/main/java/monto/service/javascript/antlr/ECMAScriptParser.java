@@ -1,5 +1,6 @@
 package monto.service.javascript.antlr; // Generated from ECMAScript.g4 by ANTLR 4.5
 
+import java.util.List;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -19,8 +20,6 @@ import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import java.util.List;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class ECMAScriptParser extends Parser {
@@ -447,9 +446,7 @@ public class ECMAScriptParser extends Parser {
   };
   public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
-  /**
-   * @deprecated Use {@link #VOCABULARY} instead.
-   */
+  /** @deprecated Use {@link #VOCABULARY} instead. */
   @Deprecated public static final String[] tokenNames;
 
   static {
@@ -500,9 +497,10 @@ public class ECMAScriptParser extends Parser {
   /**
    * Returns {@code true} iff on the current index of the parser's token stream a token of the given
    * {@code type} exists on the {@code HIDDEN} channel.
+   *
    * @param type the type of the token on the {@code HIDDEN} channel to check.
    * @return {@code true} iff on the current index of the parser's token stream a token of the given
-   * {@code type} exists on the {@code HIDDEN} channel.
+   *     {@code type} exists on the {@code HIDDEN} channel.
    */
   private boolean here(final int type) {
 
@@ -519,9 +517,10 @@ public class ECMAScriptParser extends Parser {
    * Returns {@code true} iff on the current index of the parser's token stream a token exists on
    * the {@code HIDDEN} channel which either is a line terminator, or is a multi line comment that
    * contains a line terminator.
+   *
    * @return {@code true} iff on the current index of the parser's token stream a token exists on
-   * the {@code HIDDEN} channel which either is a line terminator, or is a multi line comment that
-   * contains a line terminator.
+   *     the {@code HIDDEN} channel which either is a line terminator, or is a multi line comment
+   *     that contains a line terminator.
    */
   private boolean lineTerminatorAhead() {
 

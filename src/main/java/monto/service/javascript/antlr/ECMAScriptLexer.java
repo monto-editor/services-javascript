@@ -464,9 +464,7 @@ public class ECMAScriptLexer extends Lexer {
   };
   public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
-  /**
-   * @deprecated Use {@link #VOCABULARY} instead.
-   */
+  /** @deprecated Use {@link #VOCABULARY} instead. */
   @Deprecated public static final String[] tokenNames;
 
   static {
@@ -504,6 +502,7 @@ public class ECMAScriptLexer extends Lexer {
 
   /**
    * Returns {@code true} iff the lexer operates in strict mode.
+   *
    * @return {@code true} iff the lexer operates in strict mode.
    */
   public boolean getStrictMode() {
@@ -512,6 +511,7 @@ public class ECMAScriptLexer extends Lexer {
 
   /**
    * Sets whether the lexer operates in strict mode or not.
+   *
    * @param strictMode the flag indicating the lexer operates in strict mode or not.
    */
   public void setStrictMode(boolean strictMode) {
@@ -522,6 +522,7 @@ public class ECMAScriptLexer extends Lexer {
    * Return the next token from the character stream and records this last token in case it resides
    * on the default channel. This recorded token is used to determine when the lexer could possibly
    * match a regex literal.
+   *
    * @return the next token from the character stream.
    */
   @Override
@@ -540,6 +541,7 @@ public class ECMAScriptLexer extends Lexer {
 
   /**
    * Returns {@code true} iff the lexer can match a regex literal.
+   *
    * @return {@code true} iff the lexer can match a regex literal.
    */
   private boolean isRegexPossible() {

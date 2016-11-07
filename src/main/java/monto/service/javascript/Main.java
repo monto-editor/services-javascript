@@ -3,16 +3,14 @@ package monto.service.javascript;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import monto.service.MontoService;
+import monto.service.ZMQConfiguration;
+import monto.service.resources.ResourceServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.zeromq.ZContext;
-
-import monto.service.MontoService;
-import monto.service.ZMQConfiguration;
-import monto.service.resources.ResourceServer;
 
 public class Main {
 

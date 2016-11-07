@@ -62,9 +62,7 @@ public class JavaScriptOutliner extends MontoService {
         GsonMonto.toJsonTree(trimmer.getConverted()));
   }
 
-  /**
-   * Traverses the AST and removes unneeded information.
-   */
+  /** Traverses the AST and removes unneeded information. */
   private class OutlineTrimmer implements ASTVisitor {
 
     private Deque<Outline> converted = new ArrayDeque<>();

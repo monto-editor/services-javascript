@@ -1,7 +1,5 @@
 package monto.service.javascript;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +15,7 @@ import monto.service.registration.SourceDependency;
 import monto.service.request.Request;
 import monto.service.source.SourceMessage;
 import monto.service.types.Languages;
+import org.antlr.v4.runtime.ANTLRInputStream;
 
 public class JavaScriptTokenizer extends MontoService {
 
